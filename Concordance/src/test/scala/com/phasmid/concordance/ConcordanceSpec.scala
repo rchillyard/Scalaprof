@@ -1,23 +1,48 @@
 package com.phasmid.concordance
 
-import org.scalatest.{ FlatSpec, Matchers }
+import org.scalatest.{ FlatSpec, Matchers, Inside }
 
 /**
  * @author scalaprof
  * (c) Phasmid Software, 2015
  */
-class ConcordanceSpec extends FlatSpec with Matchers {
-  "Concordance" should "read Hello World!" in {
+class ConcordanceSpec extends FlatSpec with Matchers with Inside {
+  
+  def parse(s: String) = {
     val p = new ConcordanceParser
-    val r = p.parseAll(p.sentence,"Hello World!") match {
+    p.parseAll(p.sentence,s) match {
       case p.Success(ws,_) => ws
       case p.Failure(e,_) => println(e); List()
-      case _ => println("PositionalParser: logic error"); List()
+      case p.Error(e,_) => println(e); List()
     }
+  }
 
+  "Concordance" should "read Hello World!" in {
+    val r = parse("Hello World!")
     r should matchPattern { case h::tail => }
-    r.head should matchPattern { case (i, s) => }
-    r.head should matchPattern { case (1, "Hello") => }
-    r.tail.head should matchPattern { case (7, "World!") => }
+    r.head should matchPattern { case PositionalString("Hello") => }
+    inside(r.head) { case p @ PositionalString(_) =>
+        p.pos.line shouldBe (1)
+        p.pos.column shouldBe (1)
+    }
+    r.tail.head should matchPattern { case PositionalString("World!") => }
+    inside(r.tail.head) { case p @ PositionalString(_) =>
+        p.pos.line shouldBe (1)
+        p.pos.column shouldBe (7)
+    }
+  }
+    it should "read Hello\nWorld!" in {
+    val r = parse("Hello\nWorld!")
+    r should matchPattern { case h::tail => }
+    r.head should matchPattern { case PositionalString("Hello") => }
+    inside(r.head) { case p @ PositionalString(_) =>
+        p.pos.line shouldBe (1)
+        p.pos.column shouldBe (1)
+    }
+    r.tail.head should matchPattern { case PositionalString("World!") => }
+    inside(r.tail.head) { case p @ PositionalString(_) =>
+        p.pos.line shouldBe (2)
+        p.pos.column shouldBe (1)
+    }
   }
 }
