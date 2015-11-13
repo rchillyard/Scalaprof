@@ -11,6 +11,11 @@ import java.net.URL
 
 /**
  * @author scalaprof
+ * 
+ * TODO this class still needs work.
+ * In particular, the doMap and doReduce methods should return Future objects (without any waiting)
+ * and the method waitFor should then be able to remove the dependency on Await.
+ * At most there should be one Await in an entire program.
  */
 class Master[X, K, V](fM: (X)=>Map[K,V], fR: (V,V)=>V, fT: (V,V)=>V, zeroV: () => V) extends Actor with ActorLogging {
   val mappers = for (i <- 1 to 3) yield context.actorOf(Props.create(classOf[Mapper[X,K,V]], fM), s"mapper-$i")
