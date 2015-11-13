@@ -1,0 +1,33 @@
+package edu.neu.coe.scala;
+
+import static org.junit.Assert.assertEquals;
+
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import scala.util.Random;
+
+public class GenericTest {
+
+	private static Random random;
+
+	@BeforeClass
+	public static void setUpBeforeClass() throws Exception {
+		random = new Random(0L);
+	}
+
+	@Test
+	public void test1() {
+		int x = 0;
+		for (int i = 0; i < 2; i++)
+			x = random.nextInt();
+		assertEquals(x, -723955400);
+	}
+
+	@Test
+	public void test2() {
+		int x = random.nextInt();
+		assertEquals(x, 1033096058);
+	}
+
+}

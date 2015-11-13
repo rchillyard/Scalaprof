@@ -31,7 +31,7 @@ class ConcordanceSpec extends FlatSpec with Matchers with Inside {
         p.pos.column shouldBe (7)
     }
   }
-    it should "read Hello\nWorld!" in {
+    it should "read Hello<newline>World!" in {
     val r = parse("Hello\nWorld!")
     r should matchPattern { case h::tail => }
     r.head should matchPattern { case PositionalString("Hello") => }
