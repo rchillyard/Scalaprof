@@ -16,8 +16,7 @@ class ConcordanceSpec extends FlatSpec with Matchers {
     }
 
     r should matchPattern { case h::tail => }
-    r.head should matchPattern { case (i, s) => }
-    r.head should matchPattern { case (1, "Hello") => }
-    r.tail.head should matchPattern { case (7, "World!") => }
+    r.head should matchPattern { case PositionalString("Hello") => }
+    r.tail.head should matchPattern { case PositionalString("World!") => }
   }
 }

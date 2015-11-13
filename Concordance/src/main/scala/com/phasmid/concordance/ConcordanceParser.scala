@@ -7,25 +7,15 @@ import scala.collection.immutable.Map
 
 /**
  * @author scalaprof
- * (c) 2015
+ * (c) Phasmid Software, 2015
  */
 class ConcordanceParser extends RegexParsers {
-  
-  case class TransformableParser[T](p: Parser[T]) extends Parser[T] {
-      def ^^^^[U](t: Success[T] => Success[U]): Parser[U] = Parser({in => apply(in) match {
-        case s @ Success(_,_) => t(s)
-        case f @ Failure(_,_) => f
-        case e @ Error(_,_) => e
-      }})
-      def apply(in: Input): ParseResult[T] = p.apply(in)
-  }
   val rWord = """[\w’]+[,;\.\-\?\!\—]?""".r
-  def word: Parser[(Int,String)] = TransformableParser(regex(rWord)) ^^^^ {
-        case Success(w,pos) => Success((pos.offset-w.length+1,w),pos)
-  }
-  def sentence: Parser[Seq[(Int,String)]] = rep(word)
+  def word: Parser[PositionalString] = positioned(regex(rWord) ^^ {w => PositionalString(w)})
+  def sentence: Parser[Seq[PositionalString]] = rep(word)
 }
 
+case class PositionalString(s: String) extends Positional
 
 object ConcordanceParser {
  
@@ -34,7 +24,7 @@ object ConcordanceParser {
     val concordance = for (i <- 0 to docs.length-1) yield (args(i),parseDoc(docs(i)))
     println(concordance)
     // an alternative way of looking at the data (gives doc, page, line and char numbers with each string)
-    val q = for {(d,xxxx) <- concordance; (p,xxx) <- xxxx; (l,xx) <- xxx; (c,x) <- xx} yield (d, p,l,c,x)
+    val q = for {(d,xxxx) <- concordance; (p,xxx) <- xxxx; (l,xx) <- xxx; (_,c,x) <- xx} yield (d, p,l,c,x)
     println(q)
     // yet another way to look at the data
     val concordanceMap = concordance.toMap
@@ -51,7 +41,7 @@ object ConcordanceParser {
     for (i <- 0 to lines.length-1) yield (i+1,parseLine(lines(i)))
   }
 
-  def parseLine(line: String): Seq[(Int,String)] = {
+  def parseLine(line: String): Seq[(Int,Int,String)] = {
     def tidy(s: String) = s.replaceAll("""[,;\.\-\?\!\—]""", "")
     val p = new ConcordanceParser
     val r = p.parseAll(p.sentence,line) match {
@@ -59,6 +49,6 @@ object ConcordanceParser {
       case p.Failure(e,_) => println(e); List()
       case _ => println("PositionalParser: logic error"); List()
     }
-    r map {case (i,s) => (i,tidy(s).toLowerCase)}
+    r map {case p @ PositionalString(s) => (p.pos.line,p.pos.column,tidy(s).toLowerCase)}
   }
 }
