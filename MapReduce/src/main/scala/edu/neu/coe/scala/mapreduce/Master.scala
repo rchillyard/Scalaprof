@@ -1,7 +1,7 @@
 package edu.neu.coe.scala.mapreduce
 
 import scala.collection.mutable.{HashMap,MutableList}
-import scala.concurrent.{Future,Await}
+import scala.concurrent.{Future,Await,Promise}
 import scala.concurrent.duration._
 import scala.util._
 import akka.actor.{ Actor, ActorSystem, Props, ActorRef, ActorLogging }
@@ -11,16 +11,10 @@ import java.net.URL
 
 /**
  * @author scalaprof
- * 
- * TODO this class still needs work.
- * In particular, the doMap and doReduce methods should return Future objects (without any waiting)
- * and the method waitFor should then be able to remove the dependency on Await.
- * At most there should be one Await in an entire program.
  */
 class Master[X, K, V](fM: (X)=>Map[K,V], fR: (V,V)=>V, fT: (V,V)=>V, zeroV: () => V) extends Actor with ActorLogging {
   val mappers = for (i <- 1 to 3) yield context.actorOf(Props.create(classOf[Mapper[X,K,V]], fM), s"mapper-$i")
   val reducers = for (i <- 1 to 3) yield context.actorOf(Props.create(classOf[Reducer[K,V]], fR, zeroV), s"reducer-$i")
-  val shuffleMap = MutableList[(K,V)]()
   val mapperMap = HashMap[Int,MutableList[X]]()
   val reducerMap = HashMap[Int,MutableList[(K,V)]]()
   var total: V = zeroV()
@@ -30,36 +24,44 @@ class Master[X, K, V](fM: (X)=>Map[K,V], fR: (V,V)=>V, fT: (V,V)=>V, zeroV: () =
   override def receive = {
     case xs: Seq[X] =>
       log.info(s"received Seq[X]: with ${xs.length} elements")
-      doMap(xs)
-      doReduce()
-      sender ! Finish(total)
+      mapReduce(xs,sender)
     case x: Any =>
       log.warning(s"received unknown message type: {}",x)
   }
   
-  def doMap(xs: Seq[X]) {
+  def mapReduce(xs: Seq[X], caller: ActorRef) = {
+      val f = doMap(xs)
+      f.onComplete {
+        case Success(st) => doReduce(st, caller)
+        case f @ Failure(_) => f
+      }
+  }
+  def doMap(xs: Seq[X]): Future[Seq[(K,V)]] = {
+    def processShuffle(is: Seq[Shuffle[K,V]]) = {
+      val shuffleMap = MutableList[(K,V)]()
+      for (i <- is) for (m <- i.maps; (k,v) <- m) shuffleMap += ((k,v))
+      log.info(s"map stage complete: shuffle map has ${shuffleMap.size} entries")
+      shuffleMap.seq
+    }
     for (x <- xs) doMap(x)
     val r = for (i <- mapperMap.keySet) yield doMap(mappers(i), mapperMap(i))
     val f = Future.sequence(r.toSeq)
+    val result = Promise[Seq[(K,V)]]()
     f.onComplete {
-      case Success(is) => for (i <- is) processShuffle(i.maps)
-      case Failure(x) => log.warning(x.getLocalizedMessage)
+      case Success(is) => result.complete(Try(processShuffle(is)))
+      case Failure(x) => result.complete(Try(throw x))
     }
-    waitFor(f)
-    log.info(s"map stage complete: shuffle map has ${shuffleMap.size} entries")
+    result.future
   }
   
-  def doReduce() {
-    for ((k,v) <- shuffleMap) doReduce(k,v)
-//    log.info(s"send messages to reducers based on reducerMap: $reducerMap")
+  def doReduce(shuffles: Seq[(K,V)], caller: ActorRef) {
+    for ((k,v) <- shuffles) doReduce(k,v)
     val fs = for (k <- reducerMap.keySet.toSeq) yield doReduce(reducers(k), reducerMap(k))
     val f = Future.sequence(fs)
     f.onComplete {
-      case Success(rs) => for (r <- rs) processResult(r.map)
+      case Success(rs) => for (r <- rs) processResult(r.map); log.info(s"reduce stage complete with total=$total"); caller ! Finish(total)
       case Failure(x) => log.warning(x.getLocalizedMessage)
     }
-    waitFor(f)
-    log.info("reduce stage complete")
   }
 
   def doMap(mapper: ActorRef, xs: Seq[X]): Future[Shuffle[K,V]] = (mapper ? xs).mapTo[Shuffle[K,V]]
@@ -70,10 +72,6 @@ class Master[X, K, V](fM: (X)=>Map[K,V], fR: (V,V)=>V, fT: (V,V)=>V, zeroV: () =
     val s = mapperMap.get(which) getOrElse(MutableList[X]())
     s += x
     mapperMap.put(which,s)
-  }
-  
-  def processShuffle(ms: Seq[Map[K,V]]) {
-    for (m <- ms; (k,v) <- m) shuffleMap += ((k,v))
   }
   
   def doReduce(reducer: ActorRef, ts: Seq[(K,V)]): Future[Result[K,V]] = (reducer ? Reduction(ts)).mapTo[Result[K,V]]

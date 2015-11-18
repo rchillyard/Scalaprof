@@ -1,41 +1,30 @@
-package edu.neu.coe.scala.mapreduce
+package edu.neu.coe.scala.mapreduce.examples
 
-import scala.io.Source
 import scala.util._
 import scala.concurrent._
 import scala.concurrent.duration._
-import com.typesafe.config.{ ConfigFactory, Config }
-import akka.actor.{ Actor, ActorSystem, Props, ActorRef }
-import akka.pattern.ask
+import com.typesafe.config.ConfigFactory
+import akka.actor.{ActorSystem, Props}
 import akka.util.Timeout
 import java.net.URL
+import edu.neu.coe.scala.mapreduce._
 
 /**
  * @author scalaprof
  */
 object CountWords extends App {
 
-    val config = ConfigFactory.load()
-    implicit val system = ActorSystem("CountWords")    
-    implicit val timeout: Timeout = Timeout(5 seconds)
-    import system.dispatcher
+  val config = ConfigFactory.load()
+  implicit val system = ActorSystem("CountWords")    
+  implicit val timeout: Timeout = Timeout(5 seconds)
+  import system.dispatcher
     
-    val master = system.actorOf(Props.create(classOf[Master[URL,String,Int]], mapper _, adder _, adder _, zero _), "master")
-    val urls = for ( arg <- args ) yield Try(new URL(arg))
-    val f: Future[Finish[Int]]  = sequence(urls) match {
-      case Success(us) => (master ? us).mapTo[Finish[Int]]
-      case Failure(e) => Future.failed(e)
-    }
-    f.onComplete {
-      case Success(is) => println(s"total words: ${is.total}")
+  println(s"Count words in ${args.toList}")
+  val mapReduce = MapReduce[Int](Props.create(classOf[Master[URL,String,Int]], mapper _, adder _, adder _, zero _))
+  val f = mapReduce(args)
+  f.onComplete {
+      case Success(n) => println(s"total words: $n"); system.shutdown
       case Failure(x) => println(s"Map/reduce error: ${x.getLocalizedMessage}")
-    }
-    Await.ready(f,10.second)
-    println("Word count app shutting down")
-    system.shutdown
-  
-  def sequence[T](xs : Seq[Try[T]]) : Try[Seq[T]] = (Try(Seq[T]()) /: xs) {
-    (a, b) => for (aa <- a; bb <- b ) yield aa :+ bb
   }
   
   def mapper(u: URL): Map[String,Int] = {
