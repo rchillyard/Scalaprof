@@ -25,10 +25,10 @@ libraryDependencies ++= Seq(
 	akkaGroup %% "akka-testkit" % akkaVersion % "test",
 	akkaGroup %% "akka-slf4j" % akkaVersion, 
 	"com.typesafe" % "config" % "1.3.0",
-	"com.github.nscala-time" %% "nscala-time" % "2.0.0",
+//	"com.github.nscala-time" %% "nscala-time" % "2.0.0",
 	"ch.qos.logback" % "logback-classic" % "1.0.0" % "runtime",
-	// xml and tagsoup are for WebCrawler
-    "org.scala-lang.modules" %% "scala-xml" % "1.0.2",
-	"org.ccil.cowan.tagsoup" % "tagsoup" % "1.2.1",
+	// xml and tagsoup are for WebCrawler example
+    "org.scala-lang.modules" %% "scala-xml" % "1.0.2" % "test",
+	"org.ccil.cowan.tagsoup" % "tagsoup" % "1.2.1" % "test",
 	"org.scalatest" %% "scalatest" % scalaTestVersion % "test"    
 )
