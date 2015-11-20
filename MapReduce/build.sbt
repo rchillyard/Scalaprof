@@ -11,6 +11,7 @@ val akkaVersion = "2.3.12"
 val sprayGroup = "io.spray"
 val sprayVersion = "1.3.3"
 val sprayJsonVersion = "1.3.2"
+val scalaTestVersion = "2.2.4"
 
 ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) }
 
@@ -26,5 +27,8 @@ libraryDependencies ++= Seq(
 	"com.typesafe" % "config" % "1.3.0",
 	"com.github.nscala-time" %% "nscala-time" % "2.0.0",
 	"ch.qos.logback" % "logback-classic" % "1.0.0" % "runtime",
-    "org.scalatest" %% "scalatest" % "2.2.4" % "test"
+	// xml and tagsoup are for WebCrawler
+    "org.scala-lang.modules" %% "scala-xml" % "1.0.2",
+	"org.ccil.cowan.tagsoup" % "tagsoup" % "1.2.1",
+	"org.scalatest" %% "scalatest" % scalaTestVersion % "test"    
 )

@@ -19,12 +19,11 @@ object CountWords extends App {
   implicit val timeout: Timeout = Timeout(5 seconds)
   import system.dispatcher
     
-  println(s"Count words in ${args.toList}")
   val mapReduce = MapReduce[Int](Props.create(classOf[Master[URL,String,Int]], mapper _, adder _, adder _, zero _))
   val f = mapReduce(args)
   f.onComplete {
       case Success(n) => println(s"total words: $n"); system.shutdown
-      case Failure(x) => println(s"Map/reduce error: ${x.getLocalizedMessage}")
+      case Failure(x) => Console.err.println(s"Map/reduce error: ${x.getLocalizedMessage}"); system.shutdown
   }
   
   def mapper(u: URL): Map[String,Int] = {

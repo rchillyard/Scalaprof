@@ -3,9 +3,12 @@ package edu.neu.coe.scala.mapreduce
 import akka.actor.{ Actor, ActorLogging, ActorRef }
 import scala.collection.mutable.HashMap
 
-//
 /**
  * @author scalaprof
+ *
+ * @param <K> key type: the input message is of type Reduction[K,V], i.e. Seq[(,K,V)] and
+ * the response is of type Result[K,V], i.e. Map[K,V]
+ * @param <V> value type. See key type for more detail.
  */
 class Reducer[K,V](f: (V,V)=>V, zero: () => V) extends Actor with ActorLogging {
   
