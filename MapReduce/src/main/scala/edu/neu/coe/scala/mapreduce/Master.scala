@@ -15,11 +15,16 @@ import java.net.URL
  * @param <X> input type: the message which this actor responds to is of type Seq[X].
  * @param <K> key type: mapper groups things by this key and reducer processes said groups.
  * @param <V> output type: the message which is sent on completion to the sender is of type Finish[V].
+ * 
+ * @param fMap the mapper function which takes a sequence of X values and creates a key-value map such that each reducer will process all the values with a given key
+ * @param fReduce the reducer function which combines two values into one
+ * @param fTotal the totaling function which, like fReduce, combines two values into one (CONSIDER eliminating this parameter and using fReduce for both situations)
+ * @param fZero the function which creates a "zero" (unit) value of V
  */
-class Master[X, K, V](fM: (X)=>Map[K,V], fR: (V,V)=>V, fT: (V,V)=>V, zeroV: () => V) extends Actor with ActorLogging {
+class Master[X, K, V](fMap: (X)=>Map[K,V], fReduce: (V,V)=>V, fTotal: (V,V)=>V, fZero: () => V) extends Actor with ActorLogging {
   implicit val n = 3
-  val mappers = for (i <- 1 to n) yield context.actorOf(Props.create(classOf[Mapper[X,K,V]], fM), s"mapper-$i")
-  val reducers = for (i <- 1 to n) yield context.actorOf(Props.create(classOf[Reducer[K,V]], fR, zeroV), s"reducer-$i")
+  val mappers = for (i <- 1 to n) yield context.actorOf(Props.create(classOf[Mapper[X,K,V]], fMap), s"mapper-$i")
+  val reducers = for (i <- 1 to n) yield context.actorOf(Props.create(classOf[Reducer[K,V]], fReduce, fZero), s"reducer-$i")
   implicit val timeout = Timeout(5 seconds)
   import context.dispatcher
     
@@ -31,14 +36,14 @@ class Master[X, K, V](fM: (X)=>Map[K,V], fR: (V,V)=>V, fT: (V,V)=>V, zeroV: () =
       log.warning(s"received unknown message type: {}",x)
   }
   
-  def mapReduce(xs: Seq[X], caller: ActorRef) = {
+  private def mapReduce(xs: Seq[X], caller: ActorRef) = {
       doMap(xs).onComplete {
         case Success(st) => doReduce(st, caller)
         case f @ Failure(_) => f
       }
   }
   
-  def doMap(xs: Seq[X]): Future[Seq[(K,V)]] = {
+  private def doMap(xs: Seq[X]): Future[Seq[(K,V)]] = {
     val mapperMap = HashMap[Int,MutableList[X]]()
     
     def doMap(mapper: ActorRef, xs: Seq[X]): Future[Shuffle[K,V]] = (mapper ? xs).mapTo[Shuffle[K,V]]
@@ -68,7 +73,7 @@ class Master[X, K, V](fM: (X)=>Map[K,V], fR: (V,V)=>V, fT: (V,V)=>V, zeroV: () =
     result.future
   }
   
-  def doReduce(shuffles: Seq[(K,V)], caller: ActorRef) {
+  private def doReduce(shuffles: Seq[(K,V)], caller: ActorRef) {
     val reducerMap = HashMap[Int,MutableList[(K,V)]]()
     
     def doReduce(reducer: ActorRef, ts: Seq[(K,V)]): Future[Result[K,V]] = (reducer ? Reduction(ts)).mapTo[Result[K,V]]
@@ -81,13 +86,11 @@ class Master[X, K, V](fM: (X)=>Map[K,V], fR: (V,V)=>V, fT: (V,V)=>V, zeroV: () =
       reducerMap.put(which,x)
     }
   
-    def processResult(map: Map[K,V]): V = map.values.foldLeft(zeroV()){fT(_,_)}
-  
     for ((k,v) <- shuffles) updateReducerMap(k,v)
     val rfs = for (k <- reducerMap.keySet.toSeq) yield doReduce(reducers(k), reducerMap(k))
     val rsf = Future.sequence(rfs)
     val vsf = rsf map {rs => for (r <- rs; v <- r.map.values) yield v}
-    val vf = vsf map {vs => vs.foldLeft(zeroV()){fT(_,_)}}
+    val vf = vsf map {vs => vs.foldLeft(fZero()){fTotal(_,_)}}
     vf.onComplete {
       case Success(v) => log.info(s"reduce stage complete with total=$v"); caller ! Finish(v)
       case Failure(x) => log.warning(x.getLocalizedMessage)

@@ -12,13 +12,13 @@ import akka.actor.{ Actor, ActorLogging, ActorRef }
  * 
  * Note that the Shuffle message type is of type Seq[Map[K,V]]
  */
-class Mapper[X,K,V](f: (X)=>Map[K,V]) extends Actor with ActorLogging {
+class Mapper[X,K,V](fMap: (X)=>Map[K,V]) extends Actor with ActorLogging {
   
   override def receive = {
     case xs: Seq[X] =>
       log.info(s"received Seq[X]: with ${xs.length} elements")
-      sender ! Shuffle(xs map f)
-    case x: Any =>
-      log.warning(s"received unknown message type: {}",x)
+      sender ! Shuffle(xs map fMap)
+    case z =>
+      log.warning(s"received unknown message type: $z")
   }
 }

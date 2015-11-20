@@ -10,7 +10,7 @@ import scala.collection.mutable.HashMap
  * the response is of type Result[K,V], i.e. Map[K,V]
  * @param <V> value type. See key type for more detail.
  */
-class Reducer[K,V](f: (V,V)=>V, zero: () => V) extends Actor with ActorLogging {
+class Reducer[K,V](fReduce: (V,V)=>V, zero: () => V) extends Actor with ActorLogging {
   
   val keyMap = HashMap[K,V]()
   
@@ -23,21 +23,17 @@ class Reducer[K,V](f: (V,V)=>V, zero: () => V) extends Actor with ActorLogging {
       log.warning(s"received unknown message type: {}",x)
   }
   
-  def processReduction(counts: Seq[(K,V)]) {
-    for (
-        (k,v) <- counts
-        ) updateKeyMap(k,v)
+  private def processReduction(counts: Seq[(K,V)]) {
+    for ( (k,v) <- counts ) updateKeyMap(k,v)
   }
   
-  def updateKeyMap(k: K, v: V) {
-    val s = try {
-        keyMap(k)
-      }
+  private def updateKeyMap(k: K, v: V) {
+    val w = try { keyMap(k) }
     catch {
       case e: NoSuchElementException => {
         zero()
       }
     }
-   keyMap.put(k, f(s,v))
+   keyMap.put(k, fReduce(w,v))
   }
 }
