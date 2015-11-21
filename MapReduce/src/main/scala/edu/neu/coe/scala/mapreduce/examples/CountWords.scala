@@ -16,7 +16,7 @@ object CountWords extends App {
 
   val config = ConfigFactory.load()
   implicit val system = ActorSystem("CountWords")    
-  implicit val timeout: Timeout = Timeout(5 seconds)
+  implicit val timeout: Timeout = Timeout(10 seconds)
   import system.dispatcher
     
   val mapReduce = MapReduce[Int](Props.create(classOf[Master[URL,String,Int]], mapper _, adder _, adder _, zero _))
@@ -28,16 +28,16 @@ object CountWords extends App {
   
   def mapper(u: URL): Map[String,Int] = {
     def countWords(ws: Seq[String]): Map[String,Int] = {
-      val map = scala.collection.mutable.HashMap[String,Int]()
+      val m = scala.collection.mutable.HashMap[String,Int]()
       for (w <- ws) {
-        val x = map.get(w)
-        val z = x match {
+        val io = m.get(w)
+        val i = io match {
           case Some(y) => y+1
           case None =>  1
         }
-        map.put(w,z)
+        m.put(w,i)
       } 
-      map.toMap
+      m.toMap
     }
     val content = getMockContent(u)
     val words = content split """\s+""" map { _.toLowerCase }

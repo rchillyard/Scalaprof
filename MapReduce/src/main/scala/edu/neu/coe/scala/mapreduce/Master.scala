@@ -1,7 +1,7 @@
 package edu.neu.coe.scala.mapreduce
 
 import scala.collection.mutable.{HashMap,MutableList}
-import scala.concurrent.{Future,Await,Promise}
+import scala.concurrent.{Future,Await}
 import scala.concurrent.duration._
 import scala.util._
 import akka.actor.{ Actor, ActorSystem, Props, ActorRef, ActorLogging }
@@ -31,70 +31,61 @@ class Master[X, K, V](fMap: (X)=>Map[K,V], fReduce: (V,V)=>V, fTotal: (V,V)=>V, 
   override def receive = {
     case xs: Seq[X] =>
       log.info(s"received Seq[X]: with ${xs.length} elements")
-      mapReduce(xs,sender)
+      val caller = sender
+      mapReduce(xs).onComplete {
+        case Success(v) => caller ! Finish(v)
+        case f @ Failure(_) => log.error(s"map reduce failure: $f")
+      }
     case x: Any =>
-      log.warning(s"received unknown message type: {}",x)
+      log.warning(s"received unknown message type: $x")
   }
   
-  private def mapReduce(xs: Seq[X], caller: ActorRef) = {
-      doMap(xs).onComplete {
-        case Success(st) => doReduce(st, caller)
-        case f @ Failure(_) => f
-      }
-  }
+  private def mapReduce(xs: Seq[X]) = doMap(xs) flatMap { case st => doReduce(st)}
   
   private def doMap(xs: Seq[X]): Future[Seq[(K,V)]] = {
-    val mapperMap = HashMap[Int,MutableList[X]]()
+    val m = HashMap[Int,MutableList[X]]()
     
     def doMap(mapper: ActorRef, xs: Seq[X]): Future[Shuffle[K,V]] = (mapper ? xs).mapTo[Shuffle[K,V]]
   
     def updateMapperMap(x: X) {
-      val hash = math.abs(x.hashCode)
-      val which = hash % mappers.size
-      val s = mapperMap.get(which) getOrElse(MutableList[X]())
-      s += x
-      mapperMap.put(which,s)
+      val i = hashIt(x,mappers.size)
+      val xs = m.get(i) getOrElse(MutableList[X]())
+      xs += x
+      m.put(i,xs)
     }
   
-    def processShuffle(is: Seq[Shuffle[K,V]]) = {
-      val shuffleMap = MutableList[(K,V)]()
-      for (i <- is) for (m <- i.maps; (k,v) <- m) shuffleMap += ((k,v))
-      log.info(s"map stage complete: shuffle map has ${shuffleMap.size} entries")
-      shuffleMap.seq
+    def processShuffle(zs: Seq[Shuffle[K,V]]): Seq[(K,V)] = {
+      val kVs = MutableList[(K,V)]()
+      for (z <- zs) for (m <- z.maps; (k,v) <- m) kVs += ((k,v))
+      log.info(s"map stage complete: shuffle map has ${kVs.size} entries")
+      kVs.seq
     }
     for (x <- xs) updateMapperMap(x)
-    val r = for (i <- mapperMap.keySet) yield (mappers(i) ? mapperMap(i)).mapTo[Shuffle[K,V]]
-    val f = Future.sequence(r.toSeq)
-    val result = Promise[Seq[(K,V)]]()
-    f.onComplete {
-      case Success(is) => result.complete(Try(processShuffle(is)))
-      case Failure(x) => result.complete(Try(throw x))
-    }
-    result.future
+    val zfs = for (i <- m.keySet) yield (mappers(i) ? m(i)).mapTo[Shuffle[K,V]]
+    Future.sequence(zfs.toSeq) map {processShuffle _}
   }
+
+  /**
+   * @return an non-negative integer less than n and depending only on the hash code of x
+   */
+  private def hashIt(x: Any, n: Int) = math.abs(x.hashCode) % n
   
-  private def doReduce(shuffles: Seq[(K,V)], caller: ActorRef) {
-    val reducerMap = HashMap[Int,MutableList[(K,V)]]()
+  private def doReduce(kVs: Seq[(K,V)]): Future[V] = {
+    val m = HashMap[Int,MutableList[(K,V)]]()
     
-    def doReduce(reducer: ActorRef, ts: Seq[(K,V)]): Future[Result[K,V]] = (reducer ? Reduction(ts)).mapTo[Result[K,V]]
+    def doReduce(reducer: ActorRef, kVs: Seq[(K,V)]): Future[Result[K,V]] = (reducer ? Reduction(kVs)).mapTo[Result[K,V]]
   
     def updateReducerMap(k: K, v: V) {
-      val hash = math.abs(k.hashCode)
-      val which = hash % reducers.size
-      val x = reducerMap.get(which) getOrElse(MutableList[(K,V)]())
-      x += k -> v
-      reducerMap.put(which,x)
+      val i = hashIt(k,reducers.size)
+      val kVs = m.get(i) getOrElse(MutableList[(K,V)]())
+      kVs += k -> v
+      m.put(i,kVs)
     }
   
-    for ((k,v) <- shuffles) updateReducerMap(k,v)
-    val rfs = for (k <- reducerMap.keySet.toSeq) yield doReduce(reducers(k), reducerMap(k))
-    val rsf = Future.sequence(rfs)
-    val vsf = rsf map {rs => for (r <- rs; v <- r.map.values) yield v}
-    val vf = vsf map {vs => vs.foldLeft(fZero()){fTotal(_,_)}}
-    vf.onComplete {
-      case Success(v) => log.info(s"reduce stage complete with total=$v"); caller ! Finish(v)
-      case Failure(x) => log.warning(x.getLocalizedMessage)
-    }
+    for ((k,v) <- kVs) updateReducerMap(k,v)
+    val rfs = for (k <- m.keySet.toSeq) yield doReduce(reducers(k), m(k))
+    val vsf = for (rs <- Future.sequence(rfs)) yield for ( r <- rs; v <- r.map.values) yield v
+    for (vs <- vsf) yield vs.foldLeft(fZero()){fTotal(_,_)}
   }
 }
 

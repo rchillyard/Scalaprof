@@ -18,18 +18,13 @@ case class MapReduce[V] (master: ActorRef)(implicit system: ActorSystem) extends
   def apply(sa: Array[String]): Future[V] = {
     implicit val timeout: Timeout = Timeout(10 seconds)
     import system.dispatcher
-    val result = Promise[V]
     val uts = for ( g <- sa ) yield Try(new URL(g))    
     val xft = for (t <- sequence(uts)) yield (master ? t).mapTo[Finish[V]]
-    flatten(xft).onComplete {
-      case Success(Finish(x)) => result.complete(Try(x))
-      case Failure(e) => result.failure(e)
-    }
-    result.future
+    flatten(xft) map { case Finish(x) => x}
   } 
   
-  def sequence[T](xs : Seq[Try[T]]) : Try[Seq[T]] = (Try(Seq[T]()) /: xs) {
-    (a, b) => for (aa <- a; bb <- b ) yield aa :+ bb
+  def sequence[X](xts : Seq[Try[X]]) : Try[Seq[X]] = (Try(Seq[X]()) /: xts) {
+    (xst, xt) => for (xs <- xst; x <- xt ) yield xs :+ x
   }
   
   def flatten[X](xft : Try[Future[X]]): Future[X] = xft match {
