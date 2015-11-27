@@ -164,4 +164,32 @@ class RationalSpec extends FlatSpec with Matchers {
     val y = x * 10 / 3
     y shouldBe 'unity
   }
+  
+  "BigDecimal" should "convert to Rational" in {
+    val pi = BigDecimal(math.Pi)
+    val r = Rational(pi)
+    r.toDouble should be (math.Pi)
+  }
+  
+  "toString" should "be decimal when exact" in {
+    val r = Rational(1,2)
+    r.toString() should be ("0.5")
+  }
+  it should "be rational when not exact: 2/3" in {
+    val r = Rational(2,3)
+    r.toString() should be ("2/3")
+  }
+  it should "be decimal when not exact: pi" in {
+    val pi = Rational(BigDecimal(math.Pi))
+    pi.toString() should be ("3.141592653589793")
+  }
+  
+  "Rational(String)" should "work for 0.1" in {
+    val r = Rational("0.1")
+    r should be (Rational(1,10))
+  }
+  it should "work for 1.0e6" in {
+    val r = Rational("1.0e6")
+    r should be (Rational(10).power(6))
+  }
 }
