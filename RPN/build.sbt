@@ -13,6 +13,7 @@ libraryDependencies ++= Seq(
   cache,
   ws,
   specs2 % Test,
+  "default" %% "numerics" % "1.0.0-SNAPSHOT",
   "org.scalatest" %% "scalatest" % scalaTestVersion % "test"
   
 )

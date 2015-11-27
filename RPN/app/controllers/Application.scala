@@ -10,28 +10,22 @@ import scala.concurrent._
 import scala.concurrent.duration._
 import scala.util._
 import actors.View
+import actors.RationalCalculator
+import edu.neu.coe.scala.numerics.Rational
+import akka.actor.ActorRef
+import com.typesafe.config.{ ConfigFactory, Config }
+
 
 class Application extends Controller {
-  import play.api.libs.concurrent.Execution.Implicits.defaultContext
-  implicit val system = ActorSystem("RPN-Calculator")    
-  implicit val timeout: Timeout = Timeout(10 seconds)
-    
-  val calculator = system.actorOf(Props.create(classOf[Calculator]))
+  
+//  val config = ConfigFactory.load()
+//  val classCalculator = config.getString("actor.calculator.class")
+  
+  val appRat: ApplicationBase[_] = new ApplicationRational()
+  val appDub: ApplicationBase[_] = new ApplicationDouble()
 
-  def index = Action.async {
-    val f = (calculator ? View).mapTo[Seq[Double]]
-    f map {
-      case r => Ok(s"ScalaRPN: calculator has the following elements (starting with top): $r")
-    }
-  }
+  def index: Action[AnyContent] = appRat.index
 
-  def command(s: String) = Action.async {
-    val f = (calculator ? s).mapTo[Try[Double]] 
-    f map {
-      case Success(r) => Ok(s"""ScalaRPN: you entered "$s" and got back $r""")
-      case Failure(e) => if (s=="clr") Ok("ScalaRPN: cleared") else Ok(s"""ScalaRPN: you entered "$s" which caused error: $e""")
-//      case Failure(e) => if (s=="clr") redirect("/") else  Ok(s"""ScalaRPN: you entered "$s" which caused error: $e""")
-    }
-  }
+  def command(s: String): Action[AnyContent] = appRat.command(s)
 
 }
