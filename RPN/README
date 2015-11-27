@@ -1,0 +1,22 @@
+This project creates a reverse-Polish calculator with a web interface.
+======================================================================
+
+The components that are used by this project are:
+* Play
+* Activator
+* Akka
+* and dependencies thereof
+
+In order to run the calculator (essentially a web server), run:
+
+  activator run
+  
+Now connect your web browser to localhost:9000
+
+Passing the query "/" will simply give you the state of the calculator's stack.
+
+Passing a string following the "/" will result in passing that string to the calculator.
+
+So, for example, GET /1%202%20+ will result in a value of 3 (where %20 is the encoding for space).
+
+
