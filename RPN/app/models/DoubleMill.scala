@@ -2,14 +2,13 @@ package models
 
 import scala.collection.mutable.{Stack,Map}
 import scala.util._
-import scala.math.Numeric
-
+//
 /**
  * @author scalaprof
  */
 object DoubleMill {
-  implicit val conv: String=>Try[Double] = DoubleMill.valueOf _
-  implicit val lookup: String=>Option[Double] = DoubleMill.constants.get _
+  val conv: String=>Try[Double] = DoubleMill.valueOf _
+  val lookup: String=>Option[Double] = DoubleMill.constants.get _
   implicit val store = Map[String,Double]()
   implicit val parser = new ExpressionParser[Double](conv,lookup)
   def apply(): Mill[Double] = new Mill(Stack[Double]()) {

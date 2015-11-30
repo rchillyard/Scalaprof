@@ -9,8 +9,8 @@ import edu.neu.coe.scala.numerics.Rational
  */
 object RationalMill {
 
-  implicit val conv: String=>Try[Rational] = RationalMill.valueOf _
-  implicit val lookup: String=>Option[Rational] = RationalMill.constants.get _
+  val conv: String=>Try[Rational] = RationalMill.valueOf _
+  val lookup: String=>Option[Rational] = RationalMill.constants.get _
   implicit val store = Map[String,Rational]()
   implicit val parser = new ExpressionParser[Rational](conv,lookup)
   def apply(): Mill[Rational] = new Mill(Stack[Rational]()) {

@@ -46,6 +46,16 @@ class CalculatorSpec extends FlatSpec with Matchers with Futures with ScalaFutur
       val xtf = (taf ? "1").mapTo[Try[Rational]]
       whenReady(xtf, timeout(Span(6, Seconds))) { case Success(Rational(1,1)) => }
   }
+  it should "yield 1 when given floating point problem" in {
+      val lookup: String=>Option[Rational] = RationalMill.constants.get _
+      val conv: String=>Try[Rational] = RationalMill.valueOf _
+      val parser = new ExpressionParser[Rational](conv,lookup)
+      val mill: Mill[Rational] = RationalMill()
+      val props = Props(new Calculator(mill,parser))
+      val taf = TestActorRef(props)
+      val xtf = (taf ? "0.2 0.1 + 10 * 3 /").mapTo[Try[Rational]]
+      whenReady(xtf, timeout(Span(6, Seconds))) { case Success(Rational(1,1)) => }
+  }
   "Double Calculator" should "yield empty list for /" in {
       val lookup: String=>Option[Double] = DoubleMill.constants.get _
       val conv: String=>Try[Double] = DoubleMill.valueOf _

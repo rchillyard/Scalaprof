@@ -2,8 +2,6 @@ package models
 
 import scala.util.parsing.combinator.JavaTokenParsers
 import scala.util.Try
-import scala.math.ScalaNumericConversions
-
 
 /**
  * @author scalaprof
