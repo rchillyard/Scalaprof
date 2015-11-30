@@ -15,7 +15,7 @@ import scala.util._
  * 
  * @author scalaprof
  */
-abstract class Mill[A : Numeric](stack: Stack[A], store: Map[String,A], lookup: String=>Option[A], conv: String=>Try[A]) extends Function1[Valuable[A],Try[A]] { self =>
+abstract class Mill[A : Numeric](stack: Stack[A])(implicit store: Map[String,A]) extends Function1[Valuable[A],Try[A]] { self =>
   
   var debugMill = false;
   def value = if (stack.size>0) Success(stack.top) else Failure(new IllegalArgumentException("stack is empty"))
@@ -27,7 +27,7 @@ abstract class Mill[A : Numeric](stack: Stack[A], store: Map[String,A], lookup: 
   def has(n: Int) = assert(stack.size>=n,s"operation requires $n element(s) on stack")
  
   def apply(v: Valuable[A]) = v match {
-    case n @ Number(x) => n() match {case Success(x) => push(x); case Failure(e) => throw e}; value
+    case n @ Number(x) => n.apply match {case Success(x) => push(x); case Failure(e) => throw e}; value
     case k @ Constant(x) => k.apply match {case Success(x) => push(x); case Failure(e) => throw e}; value
     case Operator(s) => operate(s); value
     case MemInst(s,n) => memInst(s,n); value
@@ -58,7 +58,8 @@ abstract class Mill[A : Numeric](stack: Stack[A], store: Map[String,A], lookup: 
     case "rcl" => store.get(k) match {case Some(x) => push(x); case None => throw new IllegalArgumentException(s"no value at memory location $k")}
   }
   
-  def parse(s: String)(implicit parser: ExpressionParser[A]): Try[A] = parser.parseAll(parser.expr,s) match {
+  def parse(s: String)(implicit parser: ExpressionParser[A]): Try[A] = 
+    parser.parseAll(parser.expr,s) match {
       case parser.Success(ws,_) => try {
           (for (w <- ws) yield apply(w)).reverse.head
         } catch {

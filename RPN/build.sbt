@@ -6,9 +6,15 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 scalaVersion := "2.11.7"
 
+val akkaGroup = "com.typesafe.akka"
+val akkaVersion = "2.3.12"
 val scalaTestVersion = "2.2.4"
 
 libraryDependencies ++= Seq(
+	akkaGroup %% "akka-actor" % akkaVersion,
+	akkaGroup %% "akka-testkit" % akkaVersion % "test",
+	akkaGroup %% "akka-slf4j" % akkaVersion, 
+	"com.typesafe" % "config" % "1.3.0",
   jdbc,
   cache,
   ws,

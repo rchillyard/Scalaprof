@@ -10,11 +10,12 @@ class MillSpec extends FlatSpec with Matchers {
   
   implicit val conv: String=>Try[Double] = {s => Try(s.toDouble)}
   implicit val lookup: String=>Option[Double] = DoubleMill.constants.get _
-  implicit val parser = new ExpressionParser[Double]
+  implicit val parser = new ExpressionParser[Double](conv,lookup)
   implicit val n = implicitly[Numeric[Double]]
   
   "Mill(x)" should "evaluate 1 as 1.0" in {
-    DoubleMill()("1") should matchPattern { case Success(1.0) => }
+    val one = Number.apply("1")(conv)
+    DoubleMill().apply(one) should matchPattern { case Success(1.0) => }
   }
   it should "evaluate 1 1 + as 2.0" in {
     val result = DoubleMill().parse("1 1 plus")
@@ -41,15 +42,18 @@ class MillSpec extends FlatSpec with Matchers {
 
   "Mill with repeated apply" should "evaluate 1+1 as 2.0" in {
     val mill= DoubleMill()
-    mill(Number("1")) should matchPattern { case Success(1.0) => }
-    mill(Number("1")) should matchPattern { case Success(1.0) => }
+    val one = Number.apply("1")(conv)
+    mill(one) should matchPattern { case Success(1.0) => }
+    mill(one) should matchPattern { case Success(1.0) => }
     val r = mill(Operator("plus"))
     r should matchPattern { case Success(2.0) => }
   }
   it should "swap properly" in {
     val mill= DoubleMill()
-    mill(Number("2"))
-    mill(Number("3"))
+    val two = Number.apply("2")(conv)
+    val three = Number.apply("2")(conv)
+    mill(two)
+    mill(three)
     mill(Operator("swap")) should matchPattern { case Success(2.0) => }
   }
 }
