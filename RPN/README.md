@@ -4,8 +4,8 @@ This project creates a reverse-Polish calculator with a web interface.
 Reverse-polish notation (RPN) is a method of writing arithmetic expressions
 without parentheses or operator precedence.
 A number puts its value on an (infinite) stack.
-A monadic operator replaces that value x by f(x) where f represents the monadic function.
-A dyadic operator replaces the top two values of the stack by f(next,top) where f represents
+A monadic operator replaces that value _x_ by _f(x)_ where _f_ represents the monadic function.
+A dyadic operator replaces the top two values of the stack by _f(next,top)_ where _f_ represents
 the dyadic function.
 
 Details
@@ -26,7 +26,7 @@ In order to run the calculator (essentially a web server), run:
 Running the calculator from your browser
 ========================================
 
-Now connect your web browser to localhost:9000
+Now connect your web browser to _localhost:9000_
 
 Passing the query "/" will simply give you the state of the calculator's stack.
 
@@ -49,7 +49,7 @@ Supported operators are:
 And, furthermore, there are the following two memory instructions
 
 * sto:key [store the value at the top of the stack into memory location "key"]
-* rcl:key [recall the value in memory location "key", pusing it on to the stack]
+* rcl:key [recall the value in memory location "key", pushing it on to the stack]
 
 There are additionally, two (currently) constants with effective names of:
 
@@ -59,8 +59,12 @@ There are additionally, two (currently) constants with effective names of:
 Other space-delimited entities will, if possible, be recognized as numbers and non-numbers will
 be treated as operators, constants or memory instructions.
 
+In theory, there are two types of calculator available. One which works with _Double_ and one which
+works with _Rational_ (from the _Numerics_ project). In practice, there is a problem with
+the _Double_ calculator and so only the _Rational_ calculator is available. This should
+not be a hardship as there is typically better accuracy.
+
 Future enhancements
 ===================
 
-Future versions will hopefully allow different types of calculator to be selected.
-Currently, the one calculator provided uses Double as its numeric type.
+Future versions will hopefully allow different types of calculator to be selected, perhaps using Spire numbers.
