@@ -10,7 +10,10 @@ ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) }
 
 resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
 
+//EclipseKeys.withSource := true
+
 libraryDependencies ++= Seq(
+	"org.scala-lang.modules" %% "scala-xml" % "1.0.4",
 	"org.spire-math" %% "spire" % "0.10.1",
 	"org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4",
 	"org.scalatest" %% "scalatest" % scalaTestVersion % "test"
