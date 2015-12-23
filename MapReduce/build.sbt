@@ -20,6 +20,16 @@ resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/release
 libraryDependencies ++= List("spray-client") map {c => sprayGroup %% c % sprayVersion}
 libraryDependencies ++= List("spray-json") map {c => sprayGroup %% c % sprayJsonVersion}
 
+//libraryDependencies += compilerPlugin("com.typesafe" %% "abide" % "0.1-SNAPSHOT")
+
+//scalacOptions ++= Seq(
+ // "-P:abide:abidecp:<some.rules.classpath>",
+//  "-P:abide:ruleClass:<some.rule.Class>",
+//  "-P:abide:analyzerClass:<some.analyzer.generator.Module>",
+//  "-P:abide:presenterClass:<some.presenter.generator.Module>")
+  
+//libraryDependencies += "com.typesafe" %% "abide-core" % "0.1-SNAPSHOT" % "abide"
+
 libraryDependencies ++= Seq(
 	akkaGroup %% "akka-actor" % akkaVersion,
 	akkaGroup %% "akka-testkit" % akkaVersion % "test",
