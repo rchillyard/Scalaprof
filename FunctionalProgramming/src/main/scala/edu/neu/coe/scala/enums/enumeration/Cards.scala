@@ -6,7 +6,7 @@ package edu.neu.coe.scala.enums.enumeration
 
 object Rank extends Enumeration {
    type Rank = Value
-   val Ace, King, Queen, Knave, Ten, Nine, Eight, Seven, Six, Five, Four, Trey, Deuce = Value
+   val Deuce, Trey, Four, Five, Six, Seven, Eight, Nine, Ten, Knave, Queen, King, Ace = Value
    class RankValue(rank: Value) {
      def isSpot = !isHonor
      def isHonor = rank match {
@@ -19,7 +19,7 @@ object Rank extends Enumeration {
 
 object Suit extends Enumeration {
    type Suit = Value
-   val Spades, Hearts, Diamonds, Clubs = Value
+   val Clubs, Diamonds, Hearts, Spades = Value
    class SuitValue(suit: Value) {
       def isRed = !isBlack
       def isBlack = suit match {
