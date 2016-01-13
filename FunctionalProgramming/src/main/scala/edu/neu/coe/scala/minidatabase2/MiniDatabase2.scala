@@ -1,5 +1,4 @@
-package edu.neu.coe.scala
-package minidatabase2
+package edu.neu.coe.scala.minidatabase2
 
 import scala.io.Source
 import scala.util._
