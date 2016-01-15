@@ -61,14 +61,20 @@ case class Social(are: Int, group: Int, serial: Int)
 case class Date(year: Int, month: Int, day: Int)
 
 object Name {
+  val rName3 = """^([[:upper:]]\w+)\s+([[:upper:]].*)\s+([[:upper:]]\w+)$""".r
+  val rName2 = """^([[:upper:]]\w+)\s+([[:upper:]]\w+)$""".r
+  val rName1 = """^([[:upper:]]\w+)$""".r
   def apply(name: String): Name = ???
 }
 
 object Date {
+  val rDate1 = """^([[:upper:]]\w+)\s+(\d+\w\w)\s(\d{4})$""".r
+  val rDate2 = """^(\d+)\/(\d+)\/(\d+)$""".r
   def apply(year: String, month: String, day: String) = ???  
   def apply(date: String): Date = ???
 }
 
 object Social {
+  val rSsn = """^(\d{3})-(\d{2})-(\d{4})$""".r
   def apply(ssn: String): Social = ???
 }
