@@ -12,11 +12,11 @@ trait RNG[+A] {
 abstract class RNG_Java[+A](n: Long) extends RNG[A] { 
   // must be overridden by sub-classes
   def value: A
-  def newRNG(n: Long): RNG[A]
+  def newRNG(n: Long): RNG_Java[A]
   // may be overridden (if you want to define your own pseudo-random sequence)
   def nextSeed: Long = RNG_Java.nextSeed(n)
   // base method -- not normally overridden
-  def next: RNG[A] = newRNG(nextSeed)
+  def next: RNG_Java[A] = newRNG(nextSeed)
   def state = n
 }
 
@@ -25,7 +25,7 @@ object RNG_Java {
 }
 
 case class LongRNG(n: Long) extends RNG_Java[Long](n) {
-  def newRNG(n: Long): RNG[Long] = ???
+  def newRNG(n: Long) = ???
   def value = ???
 }
 
@@ -62,7 +62,7 @@ case class GaussianRNG(n: Long) extends RNG_Java[(Double,Double)](n) {
     val k = if (u<=0) 0 else math.sqrt(-2*math.log(u))
     ???
   }
-  override def nextSeed: Long = RNG_Java.nextSeed(r2.asInstanceOf[RNG_Java[UniformDoubleRNG]].state)
+  override def nextSeed: Long = RNG_Java.nextSeed(r2.state)
   override def toString = s"GaussianRNG: $n->(${value._1},${value._2})"
 }
 
@@ -99,6 +99,6 @@ object GaussianRNG {
 }
 
 object UniformDouble {
-  def apply(x: Double, y: Unit) = if (x>=0 && x<=1) new UniformDouble(x) else throw new IllegalArgumentException(s"$x is not in range 0..1")
+  def apply(x: Double, y: Unit): UniformDouble = if (x>=0 && x<=1) new UniformDouble(x) else throw new IllegalArgumentException(s"$x is not in range 0..1")
   def + (x: Double, y: UniformDouble) = y+x
 }
