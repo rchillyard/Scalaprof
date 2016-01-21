@@ -7,6 +7,11 @@ import rng._
  * @author scalaprof
  */
 class RNGSpec extends FlatSpec with Matchers {
+  
+  def sum(xs: Seq[Double]): Double = ???
+  def sumU(xs: Seq[UniformDouble]): Double = xs.foldLeft(0.0)((a,x)=>x+a)
+  def mean(xs: Seq[Double]) = sum(xs)/xs.length
+  def meanU(xs: Seq[UniformDouble]) = sumU(xs)/xs.length
 
   "RNG(0L)" should "match case RNG(-4962768465676381896L)" in {
     val r: RNG[Long] = LongRNG(0L)
@@ -17,28 +22,23 @@ class RNGSpec extends FlatSpec with Matchers {
     r.next.next should matchPattern {case LongRNG(4804307197456638271L) =>}
   }
   "7th element of RNG(0)" should "match case RNG(-4962768465676381896L)" in {
-    val l1 = RNG.rngs(LongRNG(0)) take 7 toList;    
-    (l1 last) should matchPattern {case LongRNG(488730542833106255L) =>}
+    val lrs = RNG.rngs(LongRNG(0)) take 7 toList;    
+    (lrs last) should matchPattern {case LongRNG(488730542833106255L) =>}
   }
   "Double stream" should "have zero mean" in {
-    val l1 = RNG.rngs(DoubleRNG.apply(0)) take 1001 toList;
-    val mean = (l1.foldLeft(0.0)(_ + _.value))/l1.length
-    (math.abs(mean)) shouldBe <= (5E-3)
+    val xs = RNG.values(DoubleRNG.apply(0)) take 1001 toList;
+    (math.abs(mean(xs))) shouldBe <= (5E-3)
   }
   "0..1 stream" should "have mean = 0.5 using rngs" in {
-    val l1 = RNG.rngs(UniformDoubleRNG.apply(0)) take 1001 toList;
-    def sum(r: Double, x: RNG[UniformDouble]): Double = ???
-    val mean = l1.foldLeft(0.0)(sum(_,_)) /l1.length
-    (math.abs(mean-0.5)) shouldBe <= (5E-3)
+    val xs = RNG.values(UniformDoubleRNG.apply(0)) take 1001 toList;
+    (math.abs(meanU(xs)-0.5)) shouldBe <= (5E-3)
   }
   it should "have mean = 0.5 using values(rngs)" in {
-    val l1 = RNG.values(RNG.rngs(UniformDoubleRNG.apply(0))) take 1001 toList;
-    val mean: Double = ???
-    (math.abs(mean-0.5)) shouldBe <= (5E-3)
+    val xs = RNG.values(UniformDoubleRNG.apply(0)) take 1001 toList;
+    (math.abs(meanU(xs)-0.5)) shouldBe <= (5E-3)
   }
   "Gaussian stream" should "have mean = 0 using values2(rngs)" in {
-    val l1 = RNG.values2(RNG.rngs(GaussianRNG.apply(0))) take 11111 toList;
-    val mean = (l1.foldLeft(0.0)(_ + _))/l1.length
-    (math.abs(mean)) shouldBe <= (5E-3)
+    val xs = RNG.values2(GaussianRNG.apply(0)) take 11111 toList;
+    (math.abs(mean(xs))) shouldBe <= (5E-3)
   }
 }

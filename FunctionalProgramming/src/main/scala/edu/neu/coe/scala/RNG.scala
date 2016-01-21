@@ -69,8 +69,8 @@ case class GaussianRNG(n: Long) extends RNG_Java[(Double,Double)](n) {
 object RNG {
   type SRNG[A] = Stream[RNG[A]]
   def rngs[A](r: RNG[A]): SRNG[A] = ???
-  def values[A](s: SRNG[A]): Stream[A] = ???
-  def values2[A](s: SRNG[(A,A)]): Stream[A] = ???
+  def values[A](s: RNG[A]): Stream[A] = ???
+  def values2[A](s: RNG[(A,A)]): Stream[A] = ???
 }
 
 object LongRNG {
@@ -86,7 +86,7 @@ object LongRNG {
  *  This is essentially a wrapper of Double where (implicitly) 0 <= x <= 1.
  *  Note that we would like to specify a require statement but such are not legal in Value types
  */
-case class UniformDouble(x: Double) extends AnyVal {
+case class UniformDouble(x: Double) {
     def + (y: Double) = x + y
 }
 
