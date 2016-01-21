@@ -27,13 +27,13 @@ class RNGSpec extends FlatSpec with Matchers {
   }
   "0..1 stream" should "have mean = 0.5 using rngs" in {
     val l1 = RNG.rngs(UniformDoubleRNG.apply(0)) take 1001 toList;
-    def sum(r: Double, x: RNG[UniformDouble]): Double = (l1.foldLeft(0.0)((r,x) => x.value+r)) // ???
+    def sum(r: Double, x: RNG[UniformDouble]): Double = ???
     val mean = l1.foldLeft(0.0)(sum(_,_)) /l1.length
     (math.abs(mean-0.5)) shouldBe <= (5E-3)
   }
   it should "have mean = 0.5 using values(rngs)" in {
     val l1 = RNG.values(RNG.rngs(UniformDoubleRNG.apply(0))) take 1001 toList;
-    val mean: Double = (l1.foldLeft(0.0)((r,x) => x+r))/l1.length // ???
+    val mean: Double = ???
     (math.abs(mean-0.5)) shouldBe <= (5E-3)
   }
   "Gaussian stream" should "have mean = 0 using values2(rngs)" in {
