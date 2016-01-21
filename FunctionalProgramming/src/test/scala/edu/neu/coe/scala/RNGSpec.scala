@@ -8,9 +8,13 @@ import rng._
  */
 class RNGSpec extends FlatSpec with Matchers {
   
-  def sum(xs: Seq[Double]): Double = ???
-  def sumU(xs: Seq[UniformDouble]): Double = xs.foldLeft(0.0)((a,x)=>x+a)
+  def sum(xs: Seq[Double]): Double = ??? // you must use reduceLeft here...
+  def stdDev(xs: Seq[Double]): Double = ??? // ...and here
   def mean(xs: Seq[Double]) = sum(xs)/xs.length
+  
+  // Clearly, this doesn't look good. We will soon learn how to write
+  // generic methods like sum and mean. But for now, this is what we've got.
+  def sumU(xs: Seq[UniformDouble]): Double = xs.foldLeft(0.0)((a,x)=>x+a)
   def meanU(xs: Seq[UniformDouble]) = sumU(xs)/xs.length
 
   "RNG(0L)" should "match case RNG(-4962768465676381896L)" in {
@@ -26,19 +30,19 @@ class RNGSpec extends FlatSpec with Matchers {
     (lrs last) should matchPattern {case LongRNG(488730542833106255L) =>}
   }
   "Double stream" should "have zero mean" in {
-    val xs = RNG.values(DoubleRNG.apply(0)) take 1001 toList;
+    val xs = RNG.values(DoubleRNG(0)) take 1001 toList;
     (math.abs(mean(xs))) shouldBe <= (5E-3)
   }
-  "0..1 stream" should "have mean = 0.5 using rngs" in {
-    val xs = RNG.values(UniformDoubleRNG.apply(0)) take 1001 toList;
+  "0..1 stream" should "have mean = 0.5" in {
+    val xs = RNG.values(UniformDoubleRNG(0)) take 1001 toList;
     (math.abs(meanU(xs)-0.5)) shouldBe <= (5E-3)
   }
-  it should "have mean = 0.5 using values(rngs)" in {
-    val xs = RNG.values(UniformDoubleRNG.apply(0)) take 1001 toList;
-    (math.abs(meanU(xs)-0.5)) shouldBe <= (5E-3)
-  }
-  "Gaussian stream" should "have mean = 0 using values2(rngs)" in {
-    val xs = RNG.values2(GaussianRNG.apply(0)) take 11111 toList;
+  "Gaussian stream" should "have zero mean" in {
+    val xs = RNG.values2(GaussianRNG(0)) take 11111 toList;
     (math.abs(mean(xs))) shouldBe <= (5E-3)
+  }
+  it should "have unit std. deviation" in {
+    val xs = RNG.values2(GaussianRNG(0)) take 11111 toList;
+    (math.abs(stdDev(xs))-1) shouldBe <= (5E-3)
   }
 }

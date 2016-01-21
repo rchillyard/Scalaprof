@@ -58,7 +58,7 @@ case class GaussianRNG(n: Long) extends RNG_Java[(Double,Double)](n) {
   val r2 = r1.next
   def value: (Double,Double) = {
     val u = r1.value.x
-    val v = ???
+    val v: Double = ???
     val k = if (u<=0) 0 else math.sqrt(-2*math.log(u))
     ???
   }
@@ -68,9 +68,9 @@ case class GaussianRNG(n: Long) extends RNG_Java[(Double,Double)](n) {
 
 object RNG {
   type SRNG[A] = Stream[RNG[A]]
-  def rngs[A](r: RNG[A]): SRNG[A] = ???
-  def values[A](s: RNG[A]): Stream[A] = ???
-  def values2[A](s: RNG[(A,A)]): Stream[A] = ???
+  def rngs[A](ar: RNG[A]): SRNG[A] = ???
+  def values[A](ar: RNG[A]): Stream[A] = ???
+  def values2[A](aAr: RNG[(A,A)]): Stream[A] = ???
 }
 
 object LongRNG {
