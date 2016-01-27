@@ -7,7 +7,41 @@ import scala.util._
  * @author scalaprof
  */
 class MiniDatabase2Spec extends FlatSpec with Inside with Matchers {
-
+  
+  "map2" should "succeed for two Success values" in {
+    val t1 = Success(1)
+    val t2 = Success(2)
+    val t3 = MiniDatabase2.map2(t1,t2){case (x,y) => x+y}
+    t3 should matchPattern { case Success(3) => }
+  }
+  it should "fail if any Failures" in {
+    val t0 = Failure[Int](new IllegalArgumentException)
+    val t1 = Success(1)
+    val t2 = Success(2)
+    MiniDatabase2.map2(t0,t2){case (x,y) => x+y} should matchPattern { case Failure(_) => }
+    MiniDatabase2.map2(t0,t1){case (x,y) => x+y} should matchPattern { case Failure(_) => }
+    MiniDatabase2.map2(t2,t0){case (x,y) => x+y} should matchPattern { case Failure(_) => }
+  }
+  "map3" should "succeed for two Some values" in {
+    val t1 = Some(1)
+    val t2 = Some(2)
+    val t3 = Some(3)
+    MiniDatabase2.map3(t1,t2,t3){case (x,y,z) => x+y+z} should matchPattern { case Some(6) => }
+  }
+  it should "fail if any None values" in {
+    val t1 = Some(1)
+    val t2 = None
+    val t3 = Some(3)
+    MiniDatabase2.map3(t1,t2,t3){case (x,y,z) => x+y+z} should matchPattern { case None => }
+  }
+  it should "fail if any Failures" in {
+    val t0 = Failure[Int](new IllegalArgumentException)
+    val t1 = Success(1)
+    val t2 = Success(2)
+    MiniDatabase2.map2(t0,t2){case (x,y) => x+y} should matchPattern { case Failure(_) => }
+    MiniDatabase2.map2(t0,t1){case (x,y) => x+y} should matchPattern { case Failure(_) => }
+    MiniDatabase2.map2(t2,t0){case (x,y) => x+y} should matchPattern { case Failure(_) => }
+  }
   "Height" should "succeed 6 ft 5 in" in {
     Height.parse("6 ft 5 in") should matchPattern { case Success(h) => }
   }
