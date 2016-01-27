@@ -58,7 +58,7 @@ object Height {
   def parse(height: String): Try[Height] = ???
 }
 
-case class Name(first: String, middle: String, last: String)
+case class Name(first: String, middle: Option[String], last: String)
 
 object Name {
   val rName="""^(\w+)\s+((.*)\s+)?(\w+)$""".r
