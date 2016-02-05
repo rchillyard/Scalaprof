@@ -23,7 +23,7 @@ object MonadOps {
   def flattenRecover[X](esf: Future[Seq[Either[Throwable,Seq[X]]]], f: => Throwable=>Unit)(implicit executor: ExecutionContext): Future[Seq[X]] = {
     def filter(uses: Seq[Either[Throwable, Seq[X]]]): Seq[X] = {
       val uses2 = for { use <- uses; if (use match {case Left(x) => f(x); false; case _ => true})} yield use
-      val uss = for { use <- uses2; uso = use.right.toOption; us <- uso } yield us
+      val uss = for { use <- uses2; uso = sequence(use); us <- uso } yield us
       uss flatten
     }
     for { es <- esf; e = filter(es) } yield e
