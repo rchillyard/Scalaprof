@@ -26,8 +26,8 @@ object WebCrawler extends App {
     def getLinks(g: String): Try[Seq[URL]] = 
       for (n <- HTMLParser.parse(g) recoverWith({case f=>Failure(new RuntimeException(s"parse problem with URL $u: $f"))}))
         yield getURLs(n)
-  // TODO implement. 8 points. Hint: write as a for-comprehension, using getURLContent (above) and getLinks above. You might also need MonadOps.future
- 	  ??? 
+	// TODO implement. 8 points. Hint: write as a for-comprehension, using getURLContent (above) and getLinks above. You might also need MonadOps.future
+ 	??? 
   }
 
   def wget(us: Seq[URL]): Future[Seq[Either[Throwable,Seq[URL]]]] = {

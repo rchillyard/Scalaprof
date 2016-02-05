@@ -51,5 +51,5 @@ object MonadOps {
   }
 
   // TODO implement. 7 points. This one is a little more tricky. 
-  def sequence[X](xe: Either[Throwable,X]): Option[X] = xe.right.toOption
+  def sequence[X](xe: Either[Throwable,X]): Option[X] = ???
 }
