@@ -1,46 +1,48 @@
 package edu.neu.coe.scala.crawler
 
-import scala.concurrent.Future
 import java.net.URL
 import scala.io.Source
 import scala.util._
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent._
+import scala.concurrent.duration._
+import scala.xml.Node
+import edu.neu.coe.scala.MonadOps
 
 /**
  * @author scalaprof
  */
 object WebCrawler extends App { 
 
-  def getURLContent(url: URL): Future[String] = {
+  def getURLContent(u: URL): Future[String] = {
     for {
-      connection <- Future(url.openConnection())
-      is <- Future(connection.getInputStream)
-      source = Source.fromInputStream(is)
-    } yield source.mkString
+      source <- Future(Source.fromURL(u))
+    } yield source mkString
   }
   
-  def wget(url: URL): Future[Seq[Try[URL]]] = {
-    def getLinks(content: String): Seq[Try[URL]] = {
-      def getURL(s: String) = Try(new URL(url,s))
-      println(s"parsing $url")
-      (HTMLParser.parse(content) \\ "a") map(_ \ "@href") map (_ toString) map (getURL(_))
-    }
-    for { content <- getURLContent(url) } yield getLinks(content)
+  def wget(u: URL): Future[Seq[URL]] = {
+  // TODO implement. 15 points. Hint: write as a for-comprehension, using the constructor new URL(URL,String) to get the appropriate URL for relative links 
+    def getURLs(ns: Node): Seq[URL] = ???
+    def getLinks(g: String): Try[Seq[URL]] = 
+      for (n <- HTMLParser.parse(g) recoverWith({case f=>Failure(new RuntimeException(s"parse problem with URL $u: $f"))}))
+        yield getURLs(n)
+  // TODO implement. 8 points. Hint: write as a for-comprehension, using getURLContent (above) and getLinks above. You might also need MonadOps.future
+ 	  ??? 
   }
 
-  def wget(urls: Seq[URL]): Seq[Future[Seq[Try[URL]]]] = for { url <- urls } yield wget(url)
-  
-  def liftAndFlatten(x: Seq[Future[Seq[Try[URL]]]]): Future[Seq[Try[URL]]] = Future.sequence(x) map {_ flatten}
-  
-  def crawler(args: Seq[Try[URL]], depth: Int): Unit = if (depth>0 ) {
-    val q = for {arg <- args; t <- arg.toOption} yield t
-    val r = liftAndFlatten(wget(q))
-    r.onComplete {case Success(x) => println(s"Links: $x"); crawler(x, depth-1); case Failure(z) => println(s"failure: $z")}
+  def wget(us: Seq[URL]): Future[Seq[Either[Throwable,Seq[URL]]]] = {
+    val us2 = us.distinct take 10
+    // TODO implement the rest of this, based on us2 instead of us. 12 points.
+    // Hint: Use wget(URL) (above). MonadOps.sequence and Future.sequence are also available to you to use.
+    ???
   }
-  
-println(s"web reader: ${args.toList}")
-  val urls = for ( arg <- args toList ) yield Try(new URL(arg))
-  crawler(urls, 2)
-  
-  Thread.sleep(10000)
+    
+  def crawler(depth: Int, args: Seq[URL]): Future[Seq[URL]] = {
+		def inner(urls: Seq[URL], depth: Int, accum: Seq[URL]): Future[Seq[URL]] =
+		  if ( depth>0 )
+			  for (us <- MonadOps.flattenRecover(wget(urls),{x => System.err.println(x)}); r <- inner(us,depth-1,accum ++: urls)) yield r
+			else
+			  Future.successful(accum)
+    inner(args, depth, List())
+  }
 }
