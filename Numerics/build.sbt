@@ -16,6 +16,7 @@ libraryDependencies ++= Seq(
 	"org.scala-lang.modules" %% "scala-xml" % "1.0.4",
 	"org.spire-math" %% "spire" % "0.10.1",
 	"org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4",
+	"org.apache.commons" % "commons-math3" % "3.6",
 	"org.scalatest" %% "scalatest" % scalaTestVersion % "test"
 )
 

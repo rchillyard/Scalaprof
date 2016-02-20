@@ -2,6 +2,7 @@ package edu.neu.coe.scala.parse
 
 import edu.neu.coe.scala.numerics.Rational
 import scala.util.Try
+import edu.neu.coe.scala.numerics.Fuzzy
 
 /**
  * @author scalaprof
@@ -25,3 +26,6 @@ object IntExpressionParser extends ExpressionParserNumeric[Int] {
 object RationalExpressionParser extends ExpressionParserNumeric[Rational] {
   def apply(s: String): Try[Rational] = Try(Rational.apply(s))
 }
+//object FuzzyExpressionParser extends ExpressionParserNumeric[Fuzzy] {
+//  def apply(s: String): Try[Fuzzy] = Try(Fuzzy.apply(s))
+//}

@@ -1,6 +1,7 @@
 package edu.neu.coe.scala.numerics
 
 /**
+ * This abstract class is the base class for various functions used by LazyNumber algebra.
  * @author scalaprof
  */
 
@@ -22,6 +23,13 @@ abstract class LazyFunction[X: Numeric] extends Function1[X,X] {
     override def compose[A](g: A => X): A => X = composeX(g.asInstanceOf[X=>X]).asInstanceOf[A=>X]
 }
 
+abstract class KnownDifferentiableFunction[X: Numeric](name: String, g: X=>X, ds: X=>Double*) extends DifferentiableFunction[X](g,ds:_*) {
+  override def toString = name  
+}
+abstract class DifferentiableFunction[X: Numeric](g: X=>X, ds: X=>Double*) extends DiFuncBase[X](g,ds:_*) with Function1[X,X] {
+  def apply(x: X) = g(x)
+}
+
 abstract class Known[X: Numeric](name: String) extends LazyFunction[X] {
   override def toString = name
 }
@@ -30,11 +38,6 @@ case class Identity[X : Numeric]() extends Known[X]("Identity") {
     def apply(x: X): X = x
 }
 
-// This (or something like it) is required if we have filter in LazyNumber
-//case class NoFunction[X : Numeric]() extends Known[X]("NoFunction") {
-//    def apply(x: X): X = implicitly[Numeric[X]].zero
-//}
-
 /**
  * the order of the parameters is significant. The result of applying this function is:
  * f(g(x))
@@ -42,6 +45,16 @@ case class Identity[X : Numeric]() extends Known[X]("Identity") {
 case class Composed[X : Numeric](f: X=>X, g: X=>X) extends LazyFunction[X] {
     override def toString = s"$f($g(_))"
     def apply(x: X): X = f(g(x))
+}
+case class ComposedDifferentiable[X : Numeric](g1: DiFunc[X], g2: DiFunc[X]) extends LazyFunction[X] with DiFunc[X] {
+    override def toString = s"$g1($g2(_))"
+    def arity: Int = if (g1.arity==g2.arity) g1.arity else throw new UnsupportedOperationException(s"composed differentiable function with different arities: ${g1.arity}, ${g2.arity}")
+    // This is the so-called "Chain Rule" of differentiation
+    def df_dx(i: Int): X ⇒ Double = {x => g1.df_dx(i)(g2.f(x))*g2.df_dx(i)(x)}
+    // TODO check the order here
+    def f = g1.f.compose(g2.f)
+    def apply(x: X): X = //g1.f(g2.f(x))
+      f.apply(x)
 }
 
 /**
@@ -59,6 +72,12 @@ case class Sum[X: Numeric](y: X) extends Known[X](s"add $y") {
 
 case class Product[X: Numeric](y: X) extends Known[X](s"times $y") {
   def apply(x: X): X = implicitly[Numeric[X]].times(x, y)   
+}
+
+case class ExpDifferentiable[X: Numeric]() extends KnownDifferentiableFunction[X](s"exp", Exp[X](), {x => math.exp(implicitly[Numeric[X]].toDouble(x)) })
+
+case class Exp[X: Numeric]() extends Known[X]("exp") {
+  def apply(x: X): X = math.exp(implicitly[Numeric[X]].toDouble(x)).asInstanceOf[X]
 }
 
 // Arbitrary function that is named for debugging purposes only
@@ -80,4 +99,5 @@ object LazyFunction {
   implicit object IntLazyFunction extends Identity[Int]
   implicit object RationalLazyFunction extends Identity[Rational]
   implicit object DoubleLazyFunction extends Identity[Double]
+  implicit object FuzzyLazyFunction extends Identity[Fuzzy]
 }

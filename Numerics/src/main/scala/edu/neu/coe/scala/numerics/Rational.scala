@@ -100,12 +100,12 @@ object Rational {
     val rRat = """^\s*(\d+)\s*(\/\s*(\d+)\s*)?$""".r
     val rDec = """^-?(\d|(\d+,?\d+))*(\.\d+)?(e\d+)?$""".r
     x match {
-      // TODO I don't understand why we need this first line -- but it IS necessary
+      // XXX I don't understand why we need this first line -- but it IS necessary
       case rRat(n,_,null) => Rational(n.toLong)
       case rRat(n,_,d) => normalize(n.toLong,d.toLong)
       case rRat(n) => Rational(n.toLong)
       case rDec(w,_,f,null) => Rational(BigDecimal.apply(w+f))
-      // TODO implement properly the case where the fourth component is "eN"
+      // FIXME implement properly the case where the fourth component is "eN"
       case rDec(w,_,f,e) => println(s"$w$f$e"); val b=BigDecimal.apply(w+f+e); println(s"$b"); Rational(b)
       case _ => throw new Exception(s"invalid rational expression: $x")
     }

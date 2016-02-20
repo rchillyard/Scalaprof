@@ -1,5 +1,7 @@
 package edu.neu.coe.scala.numerics
 
+import org.apache.commons.math3.distribution.NormalDistribution
+
 /**
  * @author scalaprof
  */
@@ -7,6 +9,7 @@ abstract class LazyNumber[X : Fractional](x: X, f: X=>X) extends Valuable[X] wit
   // The following println is for debugging purposes
 //  println(s"""LazyNumber: $x, f: $f; f(x)=${get}""")
   def get = f(x)
+  // Could we use CanBuildFrom/Builder here?
   def construct(x: X, f: X=>X): LazyNumber[X]
   def map(g: X=>X): LazyNumber[X] = construct(x,g.compose(f))
   def flatMap(g: X=>LazyNumber[X]): LazyNumber[X] = g(f(x))
@@ -54,6 +57,7 @@ object LazyNumber {
     }
   implicit object RationalIsLazyNumber extends LazyRational(Rational.zero,Identity())
   implicit object DoubleIsLazyNumber extends LazyDouble(Double.NaN,Identity())
+  implicit object FuzzyIsLazyNumber extends LazyFuzzy(Exact(0),Identity())
 }
 
 case class LazyRational(x: Rational, f: Rational=>Rational) extends LazyNumber[Rational](x,f) {
@@ -64,6 +68,11 @@ case class LazyDouble(x: Double, f: Double=>Double) extends LazyNumber[Double](x
   def construct(x: Double, f: Double=>Double): LazyNumber[Double] = LazyDouble(x,f)
   def fromInt(x: Int): LazyDouble = LazyDouble(x)
 }
+case class LazyFuzzy(x: Fuzzy, f: Fuzzy=>Fuzzy) extends LazyNumber[Fuzzy](x,f) {
+  import scala.Numeric._
+  def construct(x: Fuzzy, f: Fuzzy=>Fuzzy): LazyNumber[Fuzzy] = LazyFuzzy(x,f)
+  def fromInt(x: Int): LazyFuzzy = LazyFuzzy(Exact(x),Identity())
+}
 object LazyRational {
   def apply(x: Rational): LazyRational = apply(x,Identity())
   def apply(x: Long): LazyRational = apply(Rational(x))
@@ -71,4 +80,8 @@ object LazyRational {
 }
 object LazyDouble {
   def apply(x: Double): LazyDouble = apply(x,Identity())
+}
+object LazyFuzzy {
+  import Fuzzy._
+  def apply(x: Fuzzy): LazyFuzzy = apply(x,Identity())
 }
