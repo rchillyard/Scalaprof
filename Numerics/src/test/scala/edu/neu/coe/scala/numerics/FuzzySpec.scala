@@ -101,9 +101,9 @@ class FuzzySpec extends FlatSpec with Matchers {
      Fuzzy.parse("1") should matchPattern { case Success(Exact(1)) => }
   }
   it should "parse 6.67408(31)E−11" in {
-     Fuzzy.parse("6.67408(31)E−11") match {
+     Fuzzy.parse("6.67408(31)E-11") match {
       case Success(Gaussian(m,s)) => assert(math.abs(m-6.67408E-11) < 1E-5); assert(math.abs(s-3.1E-14) < (1E-10))
-      case _ => fail("should be Gaussian")
+      case f @ _ => fail(s"should be Gaussian but is $f")
     }
   }
   it should "parse 3.1415927(01)" in {

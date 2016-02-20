@@ -1,19 +1,24 @@
 package edu.neu.coe.scala.numerics
 
-import org.apache.commons.math3.distribution.NormalDistribution
-
 /**
+ * LazyNumber is an abstract (base) class for Valuable objects.
+ * The value of a LazyNumber is determined by applying the function f to the nominal value x.
+ * A LazyNumber is lazy in two senses:
+ * <ol>
+ * <li>the nominal (initial) value of a LazyNumber is call-by-name so is not evaluated until needed.</li>
+ * <li>the any function applied to the number, via map or flatMap, is composed with the existing function
+ * such that the actual value is not evaluated until necessary.</li>
+ * </ol>
  * @author scalaprof
  */
-abstract class LazyNumber[X : Fractional](x: X, f: X=>X) extends Valuable[X] with Fractional[LazyNumber[X]] {
+abstract class LazyNumber[X : Fractional](x: => X, f: X=>X) extends Valuable[X] with Fractional[LazyNumber[X]] {
   val z = implicitly[Fractional[X]]
   def get = f(x)
   // XXX Could we use CanBuildFrom/Builder here?
-  def construct(x: X, f: X=>X): LazyNumber[X]
-  def unit(x: X): LazyNumber[X] = construct(x,NullFunction())
+  def construct(x: => X, f: X=>X): LazyNumber[X]
+  def unit(x: => X): LazyNumber[X] = construct(x,NullFunction())
   def flatMap(g: X=>LazyNumber[X]): LazyNumber[X] = ??? // TODO 7 marks
   def map(f: X=>X): LazyNumber[X] = flatMap (a => unit(f(a)))
-  def filter(g: X=>Boolean): LazyNumber[X] = if (g(get)) this else construct(x,NullFunction())
   def fNegate = Product(z.negate(z.one))
   def fInvert = Named("invert",{x: X => z.div(z.one,x)})
   def fAdd(y: => LazyNumber[X]) = Sum(y.get)
@@ -56,16 +61,16 @@ object LazyNumber {
 }
 
 case class LazyRational(x: Rational, f: Rational=>Rational) extends LazyNumber[Rational](x,f) {
-  def construct(x: Rational, f: Rational=>Rational): LazyNumber[Rational] = LazyRational(x,f)
+  def construct(x: =>Rational, f: Rational=>Rational): LazyNumber[Rational] = LazyRational(x,f)
   def fromInt(x: Int): LazyRational = LazyRational(x)
 }
 case class LazyDouble(x: Double, f: Double=>Double) extends LazyNumber[Double](x,f) {
-  def construct(x: Double, f: Double=>Double): LazyNumber[Double] = LazyDouble(x,f)
+  def construct(x: =>Double, f: Double=>Double): LazyNumber[Double] = LazyDouble(x,f)
   def fromInt(x: Int): LazyDouble = LazyDouble(x)
 }
 case class LazyFuzzy(x: Fuzzy, f: Fuzzy=>Fuzzy) extends LazyNumber[Fuzzy](x,f) {
   import scala.Numeric._
-  def construct(x: Fuzzy, f: Fuzzy=>Fuzzy): LazyNumber[Fuzzy] = LazyFuzzy(x,f)
+  def construct(x: =>Fuzzy, f: Fuzzy=>Fuzzy): LazyNumber[Fuzzy] = LazyFuzzy(x,f)
   def fromInt(x: Int): LazyFuzzy = LazyFuzzy(Exact(x),NullFunction())
 }
 object LazyRational {

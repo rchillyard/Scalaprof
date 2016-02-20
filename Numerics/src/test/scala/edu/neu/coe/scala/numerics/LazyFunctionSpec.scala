@@ -23,14 +23,14 @@ class LazyFunctionSpec extends FlatSpec with Matchers {
 //	}
   
   "Compose" should "yield identity result when complementary functions composed" in {
-    val doubleHalf = double.compose(half)
-    doubleHalf.apply(Rational.one) shouldBe (Rational.one)
-  }
-  
-  ignore should "form Identity when complementary functions provided" in {
-    val doubleHalf = double.compose(half)
-    doubleHalf shouldBe (Identity[Rational]())
-  }
+	    val doubleHalf = double.compose(half)
+	    doubleHalf.apply(Rational.one) shouldBe (Rational.one)
+	  }
+	  
+	  ignore should "form Identity when complementary functions provided" in {
+	    val doubleHalf = double.compose(half)
+	    doubleHalf shouldBe (Identity[Rational]())
+	  }
   
   it should "form Composed when non-complementary functions provided (1)" in {
     val doubleHalf = genericdouble.compose(half)

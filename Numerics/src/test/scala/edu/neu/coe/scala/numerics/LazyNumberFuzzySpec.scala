@@ -12,7 +12,7 @@ class LazyNumberFuzzySpec extends FlatSpec with Matchers {
   val fuzz2 = LazyFuzzy(1,Product(2))
   // XXX why can't we say x*x here?
   def squ(x: Fuzzy): Fuzzy = x.times(x,x)
-  val fuzzSquare = Named[Fuzzy]("square",squ _)
+  val fuzzSquare = Named[Fuzzy]("square",squ)
   val fuzz4 = fuzz2 map fuzzSquare
   val fuzzy = Exact(1)
   val p = fuzzy*fuzzy

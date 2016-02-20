@@ -6,9 +6,23 @@ import scala.util._
 import edu.neu.coe.scala.parse.FuzzyParser
  
 /**
+ * The Fuzzy trait defines a quantity for which there is doubt about its actual value.
+ * This Fuzzy trait is Numeric (it extends Fractional) and thus Fuzzy values can be ordered,
+ * compared, and take part in arithmetic operations, including division.
+ * 
+ * In this implementation of Fuzzy, the actual value is represented by a Double (see the get method).
+ * 
+ * In general, a Fuzzy trait would only require ordering.
+ * 
+ * Numeric fuzzy objects define a probability distribution such that it is possible to determine the
+ * likelihood that the actual value of the fuzzy object is between two limits. Typical distributions
+ * are Gaussian (i.e. "Normal") and Bounded (i.e. a truncated Uniform distribution). Other distributions
+ * are possible of course, especially when Gaussian fuzzy objects are combined with other fuzzy objects.
+ * This package does not properly handle these situations.
+ * 
  * @author scalaprof
  */
-sealed trait Fuzzy extends Ordering[Fuzzy] with Fractional[Fuzzy] {
+sealed trait Fuzzy extends Fractional[Fuzzy] {
   /**
    * Method to map this Fuzzy object with a 1-arity DiFunc
 	 * @param f the function to apply

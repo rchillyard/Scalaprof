@@ -2,6 +2,8 @@ package edu.neu.coe.scala.numerics
 
 /**
  * This abstract class is the base class for various functions used by LazyNumber algebra.
+ * It's not that the functions are lazy, it's that they are used by the LazyNumber module.
+ * 
  * @author scalaprof
  */
 
