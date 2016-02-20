@@ -7,7 +7,7 @@ import edu.neu.coe.scala.numerics.Fuzzy
  * @author scalaprof
  */
 class FuzzyParser extends JavaTokenParsers { self =>
-  // TODO (35 marks):
+  // TODO 35 marks:
   // Implement the following grammar:
   // fuzzy ::= integer fraction? fuzz? exponent?
   // integer ::= """\-?\d+""".r
