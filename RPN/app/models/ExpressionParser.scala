@@ -6,7 +6,7 @@ import scala.util.Try
 /**
  * @author scalaprof
  */
-case class ExpressionParser[A : Numeric](conv: String=>Try[A], lookup: String=>Option[A]) extends JavaTokenParsers { self =>
+case class ExpressionParser[A](conv: String=>Try[A], lookup: String=>Option[A]) extends JavaTokenParsers { self =>
     
   def expr: Parser[List[Valuable[A]]] = rep(term)
   def term: Parser[Valuable[A]] = (meminst | value | const | op | failure("bad term"))

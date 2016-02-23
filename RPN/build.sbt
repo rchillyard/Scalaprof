@@ -15,11 +15,12 @@ libraryDependencies ++= Seq(
 	akkaGroup %% "akka-testkit" % akkaVersion % "test",
 	akkaGroup %% "akka-slf4j" % akkaVersion, 
 	"com.typesafe" % "config" % "1.3.0",
+	"org.spire-math" %% "spire" % "0.11.0",
   jdbc,
   cache,
   ws,
   specs2 % Test,
-  "default" %% "numerics" % "1.0.0-SNAPSHOT",
+  "edu.neu.coe.scala" %% "numerics" % "1.0.0-SNAPSHOT",
   "org.scalatest" %% "scalatest" % scalaTestVersion % "test"
   
 )

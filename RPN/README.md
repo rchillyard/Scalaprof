@@ -68,3 +68,6 @@ Future enhancements
 ===================
 
 Future versions will hopefully allow different types of calculator to be selected, perhaps using Spire numbers.
+
+/Users/scalaprof/Scalaprof/RPN/README.md Dec 1st 2015
+

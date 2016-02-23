@@ -1,4 +1,5 @@
-name := "Numerics"
+organization := "edu.neu.coe.scala"
+name := "numerics"
 
 version := "1.0.0-SNAPSHOT"
 

@@ -2,6 +2,8 @@ package models
 
 import scala.collection.mutable.{Stack,Map}
 import scala.util._
+import spire.math._
+import spire.implicits._
 
 /**
  * Abstract class modeling the "mill" of the calculator.
@@ -15,11 +17,11 @@ import scala.util._
  * 
  * @author scalaprof
  */
-abstract class MillNumeric[A : Numeric](stack: Stack[A])(implicit store: Map[String,A]) extends Mill[A](stack)(store) { self =>
-
+abstract class MillSpire[A : Numeric](stack: Stack[A])(implicit store: Map[String,A]) extends Mill[A](stack)(store) { self =>
+  
   def operate(s: String): Unit = s match {
     case "+" => operate("plus")
-    case "plus" => dyadic(implicitly[Numeric[A]].plus)
+    case "plus" => dyadic(implicitly[Numeric[A]].plus _)
     case "-" => operate("chs"); operate("plus")
     case "chs" => monoadic(implicitly[Numeric[A]].negate)
     case "*" => operate("times")
@@ -31,5 +33,6 @@ abstract class MillNumeric[A : Numeric](stack: Stack[A])(implicit store: Map[Str
     case "del" => has(1); pop
     case "clr" => stack.clear
     case x => throw new IllegalArgumentException(s"operator $x is not supported")
-  }  
+  }
+  
 }
