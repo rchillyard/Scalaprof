@@ -141,7 +141,7 @@ class RationalSpec extends FlatSpec with Matchers {
 
 	"2/4" should "not be OK" in {
 		val thrown = the [IllegalArgumentException] thrownBy Rational(2,4)
-				thrown.getMessage should equal ("requirement failed: Rational(2,4): arguments have common factor")
+				thrown.getMessage should equal ("requirement failed: Rational(2,4): arguments have common factor: 2")
 	}
 	it should "be OK via normalize" in {
 		Rational.normalize(2,4)
