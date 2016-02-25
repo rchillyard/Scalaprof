@@ -13,6 +13,7 @@ import akka.actor.ActorRef
 import com.typesafe.config.{ ConfigFactory, Config }
 import actors._
 import models._
+import spire.math.Real
 
 class Application extends Controller {
   
@@ -25,6 +26,7 @@ class Application extends Controller {
   val setup = which match {
     case "rational" => Application.getSetupForRational
     case "double" => Application.getSetupForDouble
+    case "spire" => Application.getSetupForSpire
     case _ => Console.err.println(s"Unsupported calculator type: $which"); Application.getSetupForRational
   }
   val calculator = system.actorOf(setup _1,setup _2)
@@ -46,17 +48,18 @@ class Application extends Controller {
 //      case Failure(e) => if (s=="clr") redirect("/") else  Ok(s"""$name: you entered "$s" which caused error: $e""")
     }
   }
-
 }
 
 object Application {
+  // TODO move these to model classes
   def getSetupForDouble(implicit system: ActorSystem) = {
 		  implicit val lookup: String=>Option[Double] = DoubleMill.constants.get _
       implicit val conv: String=>Try[Double] = DoubleMill.valueOf _
 			implicit val parser = new ExpressionParser[Double](conv,lookup)
-			val mill: Mill[Double] = DoubleMill()
+			val mill = DoubleMill()
 			// Note: the following pattern should NOT be used within an actor
       val props = Props(new Calculator(mill,parser))
+      // TODO for these methods, return mill and parser instead of props
 			(props,"doubleCalculator","Double Calculator")
   }
   // CONSIDER This assumes that we have Rational in our classpath already.
@@ -66,9 +69,21 @@ object Application {
       implicit val lookup: String=>Option[Rational] = RationalMill.constants.get _
       implicit val conv: String=>Try[Rational] = RationalMill.valueOf _
       implicit val parser = new ExpressionParser[Rational](conv,lookup)
-      val mill: Mill[Rational] = RationalMill()
+      val mill = RationalMill()
       // Note: the following pattern should NOT be used within an actor
       val props = Props(new Calculator(mill,parser))
       (props,"rationalCalculator","Rational Calculator")
+  }
+  // CONSIDER This assumes that we have Spire in our classpath already.
+  def getSetupForSpire(implicit system: ActorSystem) = {
+    import spire.implicits._
+    import spire.math._
+		  implicit val lookup: String=>Option[Real] = SpireMill.constants.get _
+      implicit val conv: String=>Try[Real] = SpireMill.valueOf _
+			implicit val parser = new ExpressionParser[Real](conv,lookup)
+			val mill = SpireMill()
+			// Note: the following pattern should NOT be used within an actor
+      val props = Props(new Calculator(mill,parser))
+			(props,"spireCalculator","Spire Calculator")
   }
 }

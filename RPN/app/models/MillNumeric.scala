@@ -31,5 +31,6 @@ abstract class MillNumeric[A : Numeric](stack: Stack[A])(implicit store: Map[Str
     case "del" => has(1); pop
     case "clr" => stack.clear
     case x => throw new IllegalArgumentException(s"operator $x is not supported")
-  }  
+  }
+  
 }

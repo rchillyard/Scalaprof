@@ -17,6 +17,7 @@ The components that are used by this project are:
 * Play
 * Activator
 * Akka
+* Spire
 * and dependencies thereof
 
 In order to run the calculator (essentially a web server), run:
@@ -59,15 +60,19 @@ There are additionally, two (currently) constants with effective names of:
 Other space-delimited entities will, if possible, be recognized as numbers and non-numbers will
 be treated as operators, constants or memory instructions.
 
-In theory, there are two types of calculator available. One which works with _Double_ and one which
+In theory, there are two broad types of calculator available. One operates on the Scala Numeric class.
+This has two implementations, in theory: one which works with _Double_ and one which
 works with _Rational_ (from the _Numerics_ project). In practice, there is a problem with
 the _Double_ calculator and so only the _Rational_ calculator is available. This should
 not be a hardship as there is typically better accuracy.
 
+However, the better calculator to use (and the default) as of March 2016 is the one that operates on the Spire Numeric class.
+
 Future enhancements
 ===================
 
-Future versions will hopefully allow different types of calculator to be selected, perhaps using Spire numbers.
+Datestamp
+=========
 
-/Users/scalaprof/Scalaprof/RPN/README.md Dec 1st 2015
+/Users/scalaprof/Scalaprof/RPN/README.md Feb 25th 2016
 
