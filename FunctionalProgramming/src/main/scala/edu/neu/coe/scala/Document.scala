@@ -2,7 +2,7 @@ package edu.neu.coe.scala
 
 trait Document[K, +V] extends (Seq[K]=>V) {
   def get(x: Seq[K]): Option[V]
-  def get(x: String)(implicit conv: String=>K): Option[V] = get(x.split("""\.""").toList.toSeq map conv)
+  def get(x: String)(implicit conv: String=>K): Option[V] = ???
 }
 case class Leaf[V](value: V) extends Document[Any,V] {
   def get(x: Seq[Any]): Option[V] = x match {
