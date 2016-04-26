@@ -44,13 +44,13 @@ trait ProductStream[X <: Product] {
 	 * @param f function to be applied to each tuple
 	 * @return a ProductStream of transformed tuples
 	 */
-  def map[Y <: Product](f: X=>Y): ProductStream[Y] = ??? // TODO 5
+  def map[Y <: Product](f: X=>Y): ProductStream[Y] = ??? // TODO Assignment6 5
   /**
    * flatMap method
 	 * @param f function to be applied to each tuple
 	 * @return a ProductStream of transformed tuples
 	 */
-  def flatMap[Y <: Product](f: X=>GenTraversableOnce[Y]): ProductStream[Y] = ??? // TODO 5
+  def flatMap[Y <: Product](f: X=>GenTraversableOnce[Y]): ProductStream[Y] = ??? // TODO Assignment6 5
   /**
    * toMap method
 	 * @param pk function to yield a primary key value from a tuple
@@ -78,7 +78,7 @@ abstract class ProductStreamBase[X <: Product] extends ProductStream[X] {
    * The keys for the map are derived from the header and the values from the tuple elements.
    * @return a Stream of Map[String,Any] objects
    */
-  def asMaps: Stream[Map[String,Any]] = ??? // TODO 14
+  def asMaps: Stream[Map[String,Any]] = ??? // TODO Assignment6 14
 }
 
 /**
@@ -174,7 +174,7 @@ object TupleStream {
   def apply[X <: Product](parser: CsvParser, input: URI): TupleStream[X] = apply(parser,Source.fromFile(input).getLines.toStream)
   def apply[X <: Product](input: URI): TupleStream[X] = apply(CsvParser(),input)
   def project[X <: Product](i: Int)(x: X): String = x.productElement(i).asInstanceOf[String]
-  def toTuple[X <: Product](ats: Seq[Try[Any]]): Try[X] = ??? // TODO 8 Hint: use MonadOps.sequence; Tuples.toTuple; and asInstanceOf
+  def toTuple[X <: Product](ats: Seq[Try[Any]]): Try[X] = ??? // TODO Assignment6 8 Hint: use MonadOps.sequence; Tuples.toTuple; and asInstanceOf
   def seqToTuple[X <: Product](ws: Seq[String])(f: String=>Try[Any]): Try[X] = toTuple(ws map f)
 }
 
@@ -201,8 +201,8 @@ case class CsvParser(
     quoteChar: String = """"""", // quotation char to all strings to include literal delimiter character
     elemParser: String=>Try[Any] = CurriedTrial(CsvParser.parseDate _)(CsvParser.dateFormatStrings) :| CsvParser.parseElem _ // element parser (used only by CSV class, not by TupleStream)
   ) extends CsvParserBase(elemParser) {
-  def row: Parser[List[String]] = ??? // TODO 3: row ::= term { delimiter term }
-  def term: Parser[String] = ??? // TODO 7: term ::= quoteChar text quoteChar | text
+  def row: Parser[List[String]] = ??? // TODO Assignment6 3: row ::= term { delimiter term }
+  def term: Parser[String] = ??? // TODO Assignment6 7: term ::= quoteChar text quoteChar | text
   def parseRow(s: String): Try[List[String]] = this.parseAll(this.row,s) match {
     case this.Success(r,_) => scala.util.Success(r)
     case f @ (this.Failure(_,_) | this.Error(_,_)) => scala.util.Failure(new RuntimeException(s"cannot parse $s: $f"))

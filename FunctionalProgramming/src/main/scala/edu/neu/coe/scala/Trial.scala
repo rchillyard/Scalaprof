@@ -27,7 +27,7 @@ package object trial {
 	 */
 	trait ComposableTrial[-X,+Y] extends Trial[X,Y] {
 		def :|[P <: X,Q >: Y](f: Trial[P,Q]) = new ComposedTrial[P,Q](this,f)
-		def :||[P <: X,Q >: Y](fs: Seq[Trial[P,Q]]): Trial[P,Q] = ??? // TODO 11
+		def :||[P <: X,Q >: Y](fs: Seq[Trial[P,Q]]): Trial[P,Q] = ??? // TODO Assignment6 11
 	}
 
 	/**
@@ -42,7 +42,7 @@ package object trial {
 	 */
   class ComposedTrial[-X,+Y](first: Trial[X,Y], second: Trial[X,Y]) extends ComposableTrial[X,Y] {
     def this(f: Trial[X,Y]) = this(Identity(),f)
-  	def apply(x: X): Try[Y] = ??? // TODO 5
+  	def apply(x: X): Try[Y] = ??? // TODO Assignment6 5
   }
 
   /**

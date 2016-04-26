@@ -28,9 +28,9 @@ abstract class LazyNumber[X : Fractional](x: => X, f: X=>X) extends Valuable[X] 
   // Operators for LazyNumber
   def + (that: LazyNumber[X]): LazyNumber[X] = plus(this,that)
   def - (that: LazyNumber[X]): LazyNumber[X] = minus(this,that)
-  def unary_-: = negate(this)
+  def unary_- = negate(this)
   def * (that: LazyNumber[X]): LazyNumber[X] = times(this,that)
-  def unary_/: = invert(this)
+  def unary_/ = invert(this)
   def / (that: LazyNumber[X]): LazyNumber[X] = div(this,that)
 
   // Methods for Numeric[LazyNumber]

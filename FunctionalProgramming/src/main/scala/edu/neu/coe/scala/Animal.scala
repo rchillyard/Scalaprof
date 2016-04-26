@@ -1,18 +1,28 @@
 package edu.neu.coe.scala
 package animal
 
-trait Animal
+trait Animal {
+  def alive: Boolean
+}
 trait Dog extends Animal {
   def name: String
+  def alive = true
 }
-case class CairnTerrier(name: String, var stripped: Boolean) extends Dog
-trait Grooming[A <: Dog, B >: Dog] extends Function1[A, B]
+case class CairnTerrier(name: String, var stripped: Boolean = false) extends Dog
+case class Chuweenie(name: String) extends Dog
+trait Grooming[A <: Dog, B >: Dog] extends (A=>B)
 // see https://en.wikipedia.org/wiki/Cairn_Terrier#Grooming
 class Stripping extends Grooming[CairnTerrier,Animal] {
-  def apply(x: CairnTerrier) = {x.stripped = true; x}
+  def apply(x: CairnTerrier) = {x.stripped = true; x.asInstanceOf[Animal]}
 }
 
-trait MyIterable[T] extends Iterable[T]
-object CairnTerrier {
+object CairnTerrier extends App {
   def apply(name: String): CairnTerrier = new CairnTerrier(name,false)
+  
+  val cindy = CairnTerrier("Cindy")
+  val grooming = new Stripping()
+  grooming(cindy).alive
+  val bentley = Chuweenie("Bentley")
+  // grooming(bentley) does not compile because Bentley is not a CairnTerrier
+  // grooming(cindy).name does not compile because Animals don't have names
 }

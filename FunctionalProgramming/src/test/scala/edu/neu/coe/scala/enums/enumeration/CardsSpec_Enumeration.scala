@@ -11,6 +11,8 @@ import Suit._
 class CardsSpec_Enumeration extends FlatSpec with Matchers with Inside {
  "ranks" should "be ordered properly" in {    
    assert(Ace > King)
+   val ace = Suit.withName("Ace")
+   assert(ace == Ace)
    val rankList = List(Ace,Trey,Four,Queen, Knave, Nine, Seven, Six,Deuce,Five,King,Ten,Eight)
    rankList.sorted.reverse  shouldBe List(Ace,King,Queen,Knave,Ten,Nine,Eight,Seven,Six,Five,Four,Trey,Deuce)
  }

@@ -1,10 +1,10 @@
-package edu.neu.coe.scala
-package sorting
+package edu.neu.coe.scala.sorting
 
 /**
  * @author scalaprof
  */
-object Sorting {
+trait RationalOrdering extends Ordering[Rational]
+object Sorting extends App {
   
   val a = List(10, 5, 8, 1, 7).sorted
   
@@ -12,6 +12,9 @@ object Sorting {
   
   import Rational.ord
 //  val s =  r.sorted
+  
+  println(a)
+//  println(r.sorted)
 }
 
   case class Rational (n: Int, d: Int) {
@@ -24,5 +27,4 @@ object Rational {
     }
   }
   
-trait RationalOrdering extends Ordering[Rational]
 

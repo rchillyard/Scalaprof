@@ -8,8 +8,12 @@ import rng._
  */
 class RNGSpec extends FlatSpec with Matchers {
   
-  def sum(xs: Seq[Double]): Double = ??? // you must use reduceLeft here...
-  def stdDev(xs: Seq[Double]): Double = ??? // ...and here
+  def sum(xs: Seq[Double]): Double = xs.reduceLeft(_+_) // you must use reduceLeft here...
+  def stdDev(xs: Seq[Double]): Double = {
+    def sqr(x: Double) = x*x
+    val mu = mean(xs)
+    math.sqrt(xs.reduceLeft((a,x)=>a+sqr(x-mu)))/xs.length // ...and here
+  }
   def mean(xs: Seq[Double]) = sum(xs)/xs.length
   
   // Clearly, this doesn't look good. We will soon learn how to write

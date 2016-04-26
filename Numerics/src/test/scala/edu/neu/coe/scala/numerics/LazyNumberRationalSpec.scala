@@ -17,7 +17,7 @@ class LazyNumberRationalSpec extends FlatSpec with Matchers {
 	}
   
   it should "be -1 after negate" in {
-    (rat1.unary_-:).get shouldBe (Rational.one.unary_-:)
+    (rat1.unary_-).get shouldBe (Rational.one.unary_-)
   }
   
   it should "be 0 after minus(1)" in {

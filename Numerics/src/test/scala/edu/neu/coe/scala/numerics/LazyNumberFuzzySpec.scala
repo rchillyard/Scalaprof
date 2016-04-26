@@ -22,7 +22,7 @@ class LazyNumberFuzzySpec extends FlatSpec with Matchers {
 	}
   
   it should "be -1 after negate" in {
-    (fuzz1.unary_-:).get shouldBe (Fuzzy.one.unary_-:)
+    (-fuzz1).get shouldBe (Fuzzy.one * -1)
   }
   
   it should "be 0 after minus(1)" in {

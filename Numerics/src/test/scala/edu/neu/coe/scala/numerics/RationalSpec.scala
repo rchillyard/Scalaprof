@@ -63,6 +63,9 @@ class RationalSpec extends FlatSpec with Matchers {
   it should "be one" in {
     Rational(1) shouldBe (Rational.one)
   }
+  it should "be positive" in {
+    Rational.one.signum shouldBe (1)
+  }
   it should "be whole" in {
     Rational.one shouldBe 'whole
   }
@@ -85,7 +88,11 @@ class RationalSpec extends FlatSpec with Matchers {
     val r = Rational(22,7) // we could choose anything here
     (Rational.one*r) should be (r)
   }
-
+  it should "be -1 when negated" in {
+    val r = Rational.one
+    -r shouldBe (Rational.one * -1)
+    r.signum shouldBe 1
+  }
 	"10" should "be OK" in {
 		Rational(10)
 	}
@@ -114,8 +121,8 @@ class RationalSpec extends FlatSpec with Matchers {
     (Rational.ten^6) should  be (Rational(1000000))
   }
   it should "barf when raised to 10th power" in {
-    // not sure why there should be a stack overflow -- but we do expect an exception
-    an [StackOverflowError] should be thrownBy Rational.ten.power(10).toInt
+    val thrown = the [RationalException] thrownBy Rational.ten.power(10).toInt
+    thrown.getMessage should equal ("10000000000 is too big for Int")
   }
 
 	"2/3" should "be OK" in {
@@ -147,6 +154,7 @@ class RationalSpec extends FlatSpec with Matchers {
     (Rational(2,3)^2) should be (Rational(4,9))
   }
   it should "barf when toInt invoked" in {
+    an [RationalException] should be thrownBy Rational(2,3).toInt
     val thrown = the [Exception] thrownBy Rational(2,3).toInt
     thrown.getMessage should equal ("2/3 is not Whole")
   }
