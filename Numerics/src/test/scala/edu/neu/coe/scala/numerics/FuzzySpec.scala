@@ -57,13 +57,13 @@ class FuzzySpec extends FlatSpec with Matchers {
 		  case Bounded(-2,0.1) =>
 		}
 	}
-	it should "implement inverse" in {
-		val dist = Bounded(2,0.1)
-		val dist2 = 1/dist
-	  dist2 should matchPattern {
-		  case Bounded(0.5,0.025) =>
-		}
-	}
+//	ignore should "implement inverse" in {
+//		val dist = Bounded(2,0.1)
+//		val dist2 = 1/dist
+//	  dist2 should matchPattern {
+//		  case Bounded(0.5,0.025) =>
+//		}
+//	}
 	it should "implement power(Int)" in {
 		val dist = Bounded(2,0.1)
 		val dist2 = dist.power(2)

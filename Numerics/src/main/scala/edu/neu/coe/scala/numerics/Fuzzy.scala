@@ -184,7 +184,7 @@ case class General(dist: AbstractRealDistribution) extends FuzzyBase(dist.getNum
 
 object Fuzzy {
   implicit object FuzzyNumeric extends FuzzyIsFractional
-  implicit def intToFuzzy(x: Int) = Exact(x)
+  implicit def intToFuzzy(x: Int): Fuzzy = Exact(x)
   val parser = new FuzzyParser
   def apply(i: String, x: Option[String], f: Option[String], e: Option[String]): Fuzzy = {
     def exponent(n: Int) = math.pow(10,n)

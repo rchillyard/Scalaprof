@@ -34,7 +34,7 @@ class LazyFunctionSpec extends FlatSpec with Matchers {
   
   it should "form Composed when non-complementary functions provided (1)" in {
     val doubleHalf = genericdouble.compose(half)
-    doubleHalf should matchPattern { case Composed(genericdouble,half) => }
+    doubleHalf should matchPattern { case Composed(`genericdouble`,half) => }
     doubleHalf(Rational.one) should be (Rational.one) 
   }
   

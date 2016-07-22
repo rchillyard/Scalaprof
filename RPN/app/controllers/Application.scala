@@ -43,7 +43,7 @@ class Application extends Controller {
   def command(s: String) = Action.async {
     val xtf = (calculator ? s).mapTo[Try[_]] 
     xtf map {
-      case Success(x) => Ok(s"""$name: you entered "$s" and got back $x""")
+      case Success(x) => Ok(s"""$name: you have entered "$s" and got back $x""")
       case Failure(e) => if (s=="clr") Ok("$name: cleared") else Ok(s"""$name: you entered "$s" which caused error: $e""")
 //      case Failure(e) => if (s=="clr") redirect("/") else  Ok(s"""$name: you entered "$s" which caused error: $e""")
     }

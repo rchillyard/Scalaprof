@@ -14,7 +14,7 @@ class Calculator[A](mill: Mill[A], parser: ExpressionParser[A]) extends Actor wi
   override def receive = {
     case View => sender ! mill.toSeq
     case x: String =>
-      log.info(s"received $x")
+      log.info(s"we got $x")
       try {
         val response = mill.parse(x)(parser)
         log.info(s"response: $response")
