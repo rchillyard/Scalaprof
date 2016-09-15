@@ -5,6 +5,9 @@ import scala.io.Source
 import scala.util.Try
 
 /**
+  * This class represents a Movie from the IMDB data file on Kaggle.
+  * Although the limitation on 22 fields in a case class has partially gone away, it's still convenient to group the different attributes together into logical classes.
+  *
   * Created by scalaprof on 9/12/16.
   */
 case class Movie(title: String, format: Format, production: Production, reviews: Reviews, director: Principal, actor1: Principal, actor2: Principal, actor3: Principal, genres: Seq[String], plotKeywords: Seq[String], imdb: String)
@@ -12,25 +15,27 @@ case class Movie(title: String, format: Format, production: Production, reviews:
 /**
   * The movie format (including language and duration).
   *
-  * @param color whether filmed in color
-  * @param language the native language of the characters
+  * @param color       whether filmed in color
+  * @param language    the native language of the characters
   * @param aspectRatio the aspect ratio of the film
-  * @param duration its length in minutes
+  * @param duration    its length in minutes
   */
 case class Format(color: Boolean, language: String, aspectRatio: Double, duration: Int) {
   override def toString = {
     val x = color match {
       case true => "Color";
       case _ => "B&W"
-    }; s"$x,$language,$aspectRatio,$duration"
+    };
+    s"$x,$language,$aspectRatio,$duration"
   }
 }
 
 /**
   * The production: its country, year, and financials
-  * @param country country of origin
-  * @param budget production budget in US dollars
-  * @param gross gross earnings (?)
+  *
+  * @param country   country of origin
+  * @param budget    production budget in US dollars
+  * @param gross     gross earnings (?)
   * @param titleYear the year the title was registered (?)
   */
 case class Production(country: String, budget: Int, gross: Int, titleYear: Int)
@@ -42,10 +47,11 @@ case class Reviews(imdbScore: Double, facebookLikes: Int, contentRating: Rating,
 
 /**
   * A cast or crew principal
-  * @param first first name
-  * @param middle middle name or initial
-  * @param last last name
-  * @param suffix suffix
+  *
+  * @param first         first name
+  * @param middle        middle name or initial
+  * @param last          last name
+  * @param suffix        suffix
   * @param facebookLikes number of FaceBook likes
   */
 case class Principal(first: String, middle: Option[String], last: String, suffix: Option[String], facebookLikes: Int) {
@@ -78,19 +84,18 @@ object Movie extends App {
 
   implicit object IngestibleMovie extends IngestibleMovie
 
-  override def main(args: Array[String]): Unit = {
-    val ingester = new Ingest[Movie]()
-    if (args.length > 0) {
-      val source = Source.fromFile(args.head)
-      val kiwiMovies: Iterator[Try[Movie]] = for (my <- ingester(source)) yield for (m <- my; if m.production.country == "New Zealand") yield m
-      kiwiMovies foreach { _ foreach { println(_) } }
-      source.close()
-    }
+  val ingester = new Ingest[Movie]()
+  if (args.length > 0) {
+    val source = Source.fromFile(args.head)
+    val kiwiMovies: Iterator[Try[Movie]] = for (my <- ingester(source)) yield for (m <- my; if m.production.country == "New Zealand") yield m
+    kiwiMovies foreach { _ foreach { println(_) } }
+    source.close()
   }
 
   /**
     * Form a list from the elements explicitly specified (by position) from the given list
-    * @param list a list of Strings
+    *
+    * @param list    a list of Strings
     * @param indices a variable number of index values for the desired elements
     * @return a list of Strings containing the specified elements in order
     */
@@ -102,6 +107,7 @@ object Movie extends App {
 
   /**
     * Alternative apply method for the Movie class
+    *
     * @param ws a sequence of Strings
     * @return a Movie
     */
@@ -166,6 +172,7 @@ object Rating {
 
   /**
     * Alternative apply method for the Rating class such that a single String is decoded
+    *
     * @param s a String made up of a code, optionally followed by a dash and a number, e.g. "R" or "PG-13"
     * @return a Rating
     */

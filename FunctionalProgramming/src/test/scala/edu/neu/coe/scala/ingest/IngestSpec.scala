@@ -24,6 +24,7 @@ class IngestSpec extends FlatSpec with Matchers {
   }
 
   it should "work for movie database" in {
+    // NOTE that you expect to see a number of exceptions thrown. That's OK. We expect that some lines will not parse correctly.
     Try(Source.fromFile("movie_metadata.csv")) match {
       case Success(source) =>
         val ingester = new Ingest[Movie]()
