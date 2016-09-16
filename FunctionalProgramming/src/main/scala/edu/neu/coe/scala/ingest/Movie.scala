@@ -3,6 +3,7 @@ package edu.neu.coe.scala.ingest
 import scala.collection.mutable
 import scala.io.Source
 import scala.util.Try
+import scala.util.matching.Regex
 
 /**
   * This class represents a Movie from the IMDB data file on Kaggle.
@@ -38,7 +39,12 @@ case class Format(color: Boolean, language: String, aspectRatio: Double, duratio
   * @param gross     gross earnings (?)
   * @param titleYear the year the title was registered (?)
   */
-case class Production(country: String, budget: Int, gross: Int, titleYear: Int)
+case class Production(country: String, budget: Int, gross: Int, titleYear: Int) {
+  def isKiwi() = this match {
+    case Production("New Zealand", _, _, _) => true
+    case _ => false
+  }
+}
 
 /**
   * Information about various forms of review, including the content rating.
@@ -48,20 +54,28 @@ case class Reviews(imdbScore: Double, facebookLikes: Int, contentRating: Rating,
 /**
   * A cast or crew principal
   *
+  * @param name          name
+  * @param facebookLikes number of FaceBook likes
+  */
+case class Principal(name: Name, facebookLikes: Int) {
+  override def toString = s"$name ($facebookLikes likes)"
+}
+
+/**
+  * A name of a contributor to the production
+  *
   * @param first         first name
   * @param middle        middle name or initial
   * @param last          last name
   * @param suffix        suffix
-  * @param facebookLikes number of FaceBook likes
   */
-case class Principal(first: String, middle: Option[String], last: String, suffix: Option[String], facebookLikes: Int) {
+case class Name(first: String, middle: Option[String], last: String, suffix: Option[String]) {
   override def toString = {
     case class Result(r: StringBuffer) { def append(s: String): Unit = r.append(" "+s); override def toString = r.toString}
     val r: Result = Result(new StringBuffer(first))
     middle foreach {r.append(_)}
     r.append(last)
     suffix foreach {r.append(_)}
-    r.append(s"($facebookLikes likes)")
     r.toString
   }
 }
@@ -87,7 +101,7 @@ object Movie extends App {
   val ingester = new Ingest[Movie]()
   if (args.length > 0) {
     val source = Source.fromFile(args.head)
-    val kiwiMovies: Iterator[Try[Movie]] = for (my <- ingester(source)) yield for (m <- my; if m.production.country == "New Zealand") yield m
+    val kiwiMovies: Iterator[Try[Movie]] = for (my <- ingester(source)) yield for (m <- my; if m.production.isKiwi) yield m
     kiwiMovies foreach { _ foreach { println(_) } }
     source.close()
   }
@@ -149,22 +163,26 @@ object Reviews {
   }
 }
 
-object Principal {
+object Name {
   // TODO this regex will not parse all names in the Movie database correctly. Still, it gets most of them.
   val rName = """^([\p{L}\-\']+\.?)\s*(([\p{L}\-]+\.)\s)?([\p{L}\-\']+\.?)(\s([\p{L}\-]+\.?))?$""".r
 
+  def apply(name: String): Name = name match {
+    case rName(first, _, null, last, _, null) => apply(first, None, last, None)
+    case rName(first, _, middle, last, _, null) => apply(first, Some(middle), last, None)
+    case rName(first, _, null, last, _, suffix) => apply(first, None, last, Some(suffix))
+    case rName(first, _, middle, last, _, suffix) => apply(first, Some(middle), last, Some(suffix))
+    case _ => throw new Exception(s"parse error in Name: $name")
+  }
+}
+
+object Principal {
   def apply(params: List[String]): Principal = params match {
     case name :: facebookLikes :: Nil => apply(name, facebookLikes.toInt)
     case _ => throw new Exception(s"logic error in Principal: $params")
   }
 
-  def apply(name: String, facebookLikes: Int): Principal = name match {
-    case rName(first, _, null, last, _, null) => apply(first, None, last, None, facebookLikes)
-    case rName(first, _, middle, last, _, null) => apply(first, Some(middle), last, None, facebookLikes)
-    case rName(first, _, null, last, _, suffix) => apply(first, None, last, Some(suffix), facebookLikes)
-    case rName(first, _, middle, last, _, suffix) => apply(first, Some(middle), last, Some(suffix), facebookLikes)
-    case _ => throw new Exception(s"parse error in Principal name: $name")
-  }
+  def apply(name: String, facebookLikes: Int): Principal = apply(Name(name),facebookLikes)
 }
 
 object Rating {

@@ -9,32 +9,48 @@ class MovieSpec extends FlatSpec with Matchers {
 
   val phi = (math.sqrt(5) + 1) / 2
 
+  behavior of "Name"
+
+  it should "work for String" in {
+    val x = Name("Tom Brady")
+    x should matchPattern {
+      case Name("Tom", None, "Brady", None) =>
+    }
+    Name("Noémie Lenoir") should matchPattern {
+      case Name("Noémie", None, "Lenoir", None) =>
+    }
+    Name("J.J. Abrams") should matchPattern {
+      case Name("J.", Some("J."), "Abrams", None) =>
+    }
+    Name("Robert Downey Jr.") should matchPattern {
+      case Name("Robert", None, "Downey", Some("Jr.")) =>
+    }
+  }
+  it should "work for Name" in {
+    val x = Name("Tom", None, "Brady", None)
+    x should matchPattern {
+      case Name("Tom", None, "Brady", None) =>
+    }
+  }
+
   behavior of "Principal"
 
   it should "work for String, Int" in {
     val x = Principal("Tom Brady", 1)
-    x should matchPattern {
-      case Principal("Tom", None, "Brady", None, 1) =>
-    }
-  }
-  it should "work for String, String, Int" in {
-    val x = Principal("Tom", None, "Brady", None, 1)
-    x should matchPattern {
-      case Principal("Tom", None, "Brady", None, 1) =>
-    }
+    x should matchPattern { case Principal(Name("Tom", None, "Brady", None), 1) => }
   }
   it should "work for List[String]" in {
     Principal(List("Tom Brady", "1")) should matchPattern {
-      case Principal("Tom", None, "Brady", None, 1) =>
+      case Principal(Name("Tom", None, "Brady", None), 1) =>
     }
     Principal(List("Noémie Lenoir", "2")) should matchPattern {
-      case Principal("Noémie", None, "Lenoir", None, 2) =>
+      case Principal(Name("Noémie", None, "Lenoir", None), 2) =>
     }
     Principal(List("J.J. Abrams", "3")) should matchPattern {
-      case Principal("J.", Some("J."), "Abrams", None, 3) =>
+      case Principal(Name("J.", Some("J."), "Abrams", None), 3) =>
     }
     Principal(List("Robert Downey Jr.", "4")) should matchPattern {
-      case Principal("Robert", None, "Downey", Some("Jr."), 4) =>
+      case Principal(Name("Robert", None, "Downey", Some("Jr.")), 4) =>
     }
 
   }
@@ -88,6 +104,10 @@ class MovieSpec extends FlatSpec with Matchers {
     x should matchPattern {
       case Production("Kenya", 1000000, 1000001, 2016) =>
     }
+  }
+  it should "define isKiwi properly" in {
+    Production("Kenya", 1000000, 1000001, 2016).isKiwi() shouldBe false
+    Production("New Zealand", 1000000, 1000001, 2016).isKiwi() shouldBe true
   }
 
   behavior of "Reviews"
