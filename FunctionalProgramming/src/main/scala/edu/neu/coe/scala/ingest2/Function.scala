@@ -5,7 +5,7 @@ import scala.util.Try
 /**
   * Created by scalaprof on 10/2/16.
   */
-object OurFunction {
+object Function {
 
   /**
     * The map2 function. You already know this one!

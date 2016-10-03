@@ -160,9 +160,9 @@ object Format {
   // XXX I'm not sure why we can't simply reference apply directly without having to do it this way
   val applyFormat: (Boolean, String, Double, Int) => Format = { (x1, x2, x3, x4) => apply(x1, x2, x3, x4) }
   val applyC = Format.applyFormat.curried
-  val applyCi = OurFunction.invert4(applyC)
-  val applyCU2 = OurFunction.uncurried2(applyCi)
-  val applyCu2L2 = OurFunction.lift2(applyCU2)
+  val applyCi = Function.invert4(applyC)
+  val applyCU2 = Function.uncurried2(applyCi)
+  val applyCu2L2 = Function.lift2(applyCU2)
 }
 
 object Production {
@@ -174,14 +174,14 @@ object Production {
 
   val applyProduction: (String, Int, Int, Int) => Production = { (x1, x2, x3, x4) => apply(x1, x2, x3, x4) }
   val applyC = Production.applyProduction.curried
-  val applyCi = OurFunction.invert4(applyC)
-  val applyCU3 = OurFunction.uncurried3(applyCi)
-  val applyCu3L3 = OurFunction.lift3(applyCU3)
+  val applyCi = Function.invert4(applyC)
+  val applyCU3 = Function.uncurried3(applyCi)
+  val applyCu3L3 = Function.lift3(applyCU3)
 }
 
 object Reviews {
   def parse(imdbScore: Try[Double], facebookLikes: Try[Int], contentRating: Try[Rating], numUsersReview: Try[Int], numUsersVoted: Try[Int], numCriticReviews: Try[Int], totalFacebookLikes: Try[Int]): Try[Reviews] =
-    OurFunction.map7(imdbScore, facebookLikes, contentRating, numUsersReview, numUsersVoted, numCriticReviews, totalFacebookLikes)(Reviews.apply)
+    Function.map7(imdbScore, facebookLikes, contentRating, numUsersReview, numUsersVoted, numCriticReviews, totalFacebookLikes)(Reviews.apply)
 
   def parse(params: List[String]): Try[Reviews] = params match {
     case imdbScore :: facebookLikes :: contentRating :: numUsersReview :: numUsersVoted :: numCriticReviews :: totalFacebookLikes :: Nil => parse(Try(imdbScore.toDouble), Try(facebookLikes.toInt), Try(Rating(contentRating)), Try(numUsersReview.toInt), Try(numUsersVoted.toInt), Try(numCriticReviews.toInt), Try(totalFacebookLikes.toInt))
