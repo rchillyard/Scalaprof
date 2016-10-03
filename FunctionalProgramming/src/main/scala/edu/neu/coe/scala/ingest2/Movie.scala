@@ -13,7 +13,7 @@ import scala.util._
   *
   * Created by scalaprof on 9/12/16.
   */
-case class Movie(title: String, format: Try[Format], production: Try[Production], reviews: Try[Reviews], director: Principal, actor1: Principal, actor2: Principal, actor3: Principal, genres: Seq[String], plotKeywords: Seq[String], imdb: String)
+case class Movie(title: String, format: Try[Format], production: Try[Production], reviews: Try[Reviews], director: Try[Principal], actor1: Try[Principal], actor2: Try[Principal], actor3: Try[Principal], genres: Seq[String], plotKeywords: Seq[String], imdb: String)
 
 /**
   * The movie format (including language and duration).
@@ -139,10 +139,10 @@ object Movie extends App {
     val format = Format.parse(elements(ws, 0, 19, 26, 3))
     val production = Production.parse(elements(ws, 20, 22, 8, 23))
     val reviews = Reviews.parse(elements(ws, 25, 27, 21, 18, 12, 2, 13))
-    val director = Principal(elements(ws, 1, 4))
-    val actor1 = Principal(elements(ws, 10, 7))
-    val actor2 = Principal(elements(ws, 6, 24))
-    val actor3 = Principal(elements(ws, 14, 5))
+    val director = Principal.parse(elements(ws, 1, 4))
+    val actor1 = Principal.parse(elements(ws, 10, 7))
+    val actor2 = Principal.parse(elements(ws, 6, 24))
+    val actor3 = Principal.parse(elements(ws, 14, 5))
     val plotKeywords = ws(16).split("""\|""").toList
     val genres = ws(9).split("""\|""").toList
     val imdb = ws(17)
@@ -154,7 +154,7 @@ object Format {
   def parse(params: List[String]): Try[Format] = params match {
     case color :: language :: aspectRatio :: duration :: Nil =>
       for (f <- fy(Try(duration.toInt), Try(aspectRatio.toDouble))) yield f(language)(color == "Color")
-    case _ => throw new Exception(s"logic error in Format: $params")
+    case _ => Failure(new Exception(s"logic error in Format: $params"))
   }
 
   import Function._
@@ -165,7 +165,7 @@ object Production {
   def parse(params: List[String]): Try[Production] = params match {
     case country :: budget :: gross :: titleYear :: Nil =>
       for (f <- fy(Try(titleYear.toInt), Try(gross.toInt), Try(budget.toInt))) yield f(country)
-    case _ => throw new Exception(s"logic error in Production: $params")
+    case _ => Failure(new Exception(s"logic error in Production: $params"))
   }
 
   import Function._
@@ -186,22 +186,20 @@ object Name {
   // XXX this regex will not parse all names in the Movie database correctly. Still, it gets most of them.
   val rName = """^([\p{L}\-\']+\.?)\s*(([\p{L}\-]+\.)\s)?([\p{L}\-\']+\.?)(\s([\p{L}\-]+\.?))?$""".r
 
-  def apply(name: String): Name = name match {
-    case rName(first, _, null, last, _, null) => apply(first, None, last, None)
-    case rName(first, _, middle, last, _, null) => apply(first, Some(middle), last, None)
-    case rName(first, _, null, last, _, suffix) => apply(first, None, last, Some(suffix))
-    case rName(first, _, middle, last, _, suffix) => apply(first, Some(middle), last, Some(suffix))
-    case _ => throw new Exception(s"parse error in Name: $name")
+  def parse(name: String): Try[Name] = name match {
+    case rName(first, _, null, last, _, null) => Success(apply(first, None, last, None))
+    case rName(first, _, middle, last, _, null) => Success(apply(first, Some(middle), last, None))
+    case rName(first, _, null, last, _, suffix) => Success(apply(first, None, last, Some(suffix)))
+    case rName(first, _, middle, last, _, suffix) => Success(apply(first, Some(middle), last, Some(suffix)))
+    case _ => Failure(new Exception(s"parse error in Name: $name"))
   }
 }
 
 object Principal {
-  def apply(params: List[String]): Principal = params match {
-    case name :: facebookLikes :: Nil => apply(name, facebookLikes.toInt)
-    case _ => throw new Exception(s"logic error in Principal: $params")
+  def parse(params: List[String]): Try[Principal] = params match {
+    case name :: facebookLikes :: Nil => Function.map2(Name.parse(name), Try(facebookLikes.toInt))(apply _)
+    case _ => Failure(new Exception(s"logic error in Principal: $params"))
   }
-
-  def apply(name: String, facebookLikes: Int): Principal = apply(Name(name), facebookLikes)
 }
 
 object Rating {

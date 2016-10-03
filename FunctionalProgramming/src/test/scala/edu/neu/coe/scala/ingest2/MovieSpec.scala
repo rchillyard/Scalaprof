@@ -14,18 +14,18 @@ class MovieSpec extends FlatSpec with Matchers {
   behavior of "Name"
 
   it should "work for String" in {
-    val x = Name("Tom Brady")
+    val x = Name.parse("Tom Brady")
     x should matchPattern {
-      case Name("Tom", None, "Brady", None) =>
+      case Success(Name("Tom", None, "Brady", None)) =>
     }
-    Name("Noémie Lenoir") should matchPattern {
-      case Name("Noémie", None, "Lenoir", None) =>
+    Name.parse("Noémie Lenoir") should matchPattern {
+      case Success(Name("Noémie", None, "Lenoir", None)) =>
     }
-    Name("J.J. Abrams") should matchPattern {
-      case Name("J.", Some("J."), "Abrams", None) =>
+    Name.parse("J.J. Abrams") should matchPattern {
+      case Success(Name("J.", Some("J."), "Abrams", None)) =>
     }
-    Name("Robert Downey Jr.") should matchPattern {
-      case Name("Robert", None, "Downey", Some("Jr.")) =>
+    Name.parse("Robert Downey Jr.") should matchPattern {
+      case Success(Name("Robert", None, "Downey", Some("Jr."))) =>
     }
   }
   it should "work for Name" in {
@@ -37,24 +37,19 @@ class MovieSpec extends FlatSpec with Matchers {
 
   behavior of "Principal"
 
-  it should "work for String, Int" in {
-    val x = Principal("Tom Brady", 1)
-    x should matchPattern { case Principal(Name("Tom", None, "Brady", None), 1) => }
-  }
   it should "work for List[String]" in {
-    Principal(List("Tom Brady", "1")) should matchPattern {
-      case Principal(Name("Tom", None, "Brady", None), 1) =>
+    Principal.parse(List("Tom Brady", "1")) should matchPattern {
+      case Success(Principal(Name("Tom", None, "Brady", None), 1)) =>
     }
-    Principal(List("Noémie Lenoir", "2")) should matchPattern {
-      case Principal(Name("Noémie", None, "Lenoir", None), 2) =>
+    Principal.parse(List("Noémie Lenoir", "2")) should matchPattern {
+      case Success(Principal(Name("Noémie", None, "Lenoir", None), 2)) =>
     }
-    Principal(List("J.J. Abrams", "3")) should matchPattern {
-      case Principal(Name("J.", Some("J."), "Abrams", None), 3) =>
+    Principal.parse(List("J.J. Abrams", "3")) should matchPattern {
+      case Success(Principal(Name("J.", Some("J."), "Abrams", None), 3)) =>
     }
-    Principal(List("Robert Downey Jr.", "4")) should matchPattern {
-      case Principal(Name("Robert", None, "Downey", Some("Jr.")), 4) =>
+    Principal.parse(List("Robert Downey Jr.", "4")) should matchPattern {
+      case Success(Principal(Name("Robert", None, "Downey", Some("Jr.")), 4)) =>
     }
-
   }
 
   behavior of "Rating"
