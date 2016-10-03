@@ -110,7 +110,7 @@ object Movie extends App {
 
   def getMoviesFromCountry(source: BufferedSource, country: String): Iterator[Try[Movie]] = {
     for (my <- ingester(source)) yield
-      // TODO 12 points -- using a pattern match (NOT a filter) -- and see Assignment4 for important hint
+      // TODO 12 points -- using for comprehension based on pattern match (NOT a filter) -- and see Assignment4 for important hint
       ???
   }
 
@@ -153,28 +153,23 @@ object Movie extends App {
 object Format {
   def parse(params: List[String]): Try[Format] = params match {
     case color :: language :: aspectRatio :: duration :: Nil =>
-      for (f <- applyCu2L2(Try(duration.toInt), Try(aspectRatio.toDouble))) yield f(language)(color == "Color")
+      for (f <- fy(Try(duration.toInt), Try(aspectRatio.toDouble))) yield f(language)(color == "Color")
     case _ => throw new Exception(s"logic error in Format: $params")
   }
 
-  val applyC = (apply _).curried
-  val reapply = scala.Function.uncurried(applyC)
-  val applyCi = Function.invert4(applyC)
-  val applyCU2 = Function.uncurried2(applyCi)
-  val applyCu2L2 = Function.lift2(applyCU2)
+  import Function._
+  val fy = lift2(uncurried2(invert4((apply _).curried)))
 }
 
 object Production {
   def parse(params: List[String]): Try[Production] = params match {
     case country :: budget :: gross :: titleYear :: Nil =>
-      for (f <- applyCu3L3(Try(titleYear.toInt), Try(gross.toInt), Try(budget.toInt))) yield f(country)
+      for (f <- fy(Try(titleYear.toInt), Try(gross.toInt), Try(budget.toInt))) yield f(country)
     case _ => throw new Exception(s"logic error in Production: $params")
   }
 
-  val applyC = (apply _).curried
-  val applyCi = Function.invert4(applyC)
-  val applyCU3 = Function.uncurried3(applyCi)
-  val applyCu3L3 = Function.lift3(applyCU3)
+  import Function._
+  val fy = lift3(uncurried3(invert4((apply _).curried)))
 }
 
 object Reviews {
