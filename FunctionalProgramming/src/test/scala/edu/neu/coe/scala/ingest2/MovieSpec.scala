@@ -115,8 +115,8 @@ class MovieSpec extends FlatSpec with Matchers {
     }
   }
   it should "define isKiwi properly" in {
-    Production("Kenya", 1000000, 1000001, 2016).isKiwi() shouldBe false
-    Production("New Zealand", 1000000, 1000001, 2016).isKiwi() shouldBe true
+    Production("Kenya", 1000000, 1000001, 2016).isKiwi shouldBe false
+    Production("New Zealand", 1000000, 1000001, 2016).isKiwi shouldBe true
   }
 
   behavior of "Reviews"

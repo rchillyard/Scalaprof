@@ -104,15 +104,14 @@ object Movie extends App {
   if (args.length > 0) {
     val source = Source.fromFile(args.head)
     val kiwiMovies = getMoviesFromCountry(source,"New Zealand")
-    kiwiMovies foreach { _ foreach { println(_) } }
+    kiwiMovies foreach { _ foreach (println) }
     source.close()
   }
 
-  def getMoviesFromCountry(source: BufferedSource, country: String): Iterator[Try[Movie]] = {
+  def getMoviesFromCountry(source: BufferedSource, country: String): Iterator[Try[Movie]] =
     for (my <- ingester(source)) yield
       // TODO 12 points -- using for comprehension based on pattern match (NOT a filter) -- and see Assignment4 for important hint
       ???
-  }
 
   /**
     * Form a list from the elements explicitly specified (by position) from the given list
