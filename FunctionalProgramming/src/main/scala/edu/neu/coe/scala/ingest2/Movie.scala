@@ -157,9 +157,8 @@ object Format {
     case _ => throw new Exception(s"logic error in Format: $params")
   }
 
-  // XXX I'm not sure why we can't simply reference apply directly without having to do it this way
-  val applyFormat: (Boolean, String, Double, Int) => Format = { (x1, x2, x3, x4) => apply(x1, x2, x3, x4) }
-  val applyC = Format.applyFormat.curried
+  val applyC = (apply _).curried
+  val reapply = scala.Function.uncurried(applyC)
   val applyCi = Function.invert4(applyC)
   val applyCU2 = Function.uncurried2(applyCi)
   val applyCu2L2 = Function.lift2(applyCU2)
@@ -172,8 +171,7 @@ object Production {
     case _ => throw new Exception(s"logic error in Production: $params")
   }
 
-  val applyProduction: (String, Int, Int, Int) => Production = { (x1, x2, x3, x4) => apply(x1, x2, x3, x4) }
-  val applyC = Production.applyProduction.curried
+  val applyC = (apply _).curried
   val applyCi = Function.invert4(applyC)
   val applyCU3 = Function.uncurried3(applyCi)
   val applyCu3L3 = Function.lift3(applyCU3)
