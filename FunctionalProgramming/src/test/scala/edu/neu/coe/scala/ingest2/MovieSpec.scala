@@ -2,7 +2,7 @@ package edu.neu.coe.scala.ingest2
 
 import org.scalatest.{FlatSpec, Matchers}
 
-import scala.util.Success
+import scala.util._
 
 /**
   * Created by scalaprof on 9/13/16.
@@ -61,22 +61,28 @@ class MovieSpec extends FlatSpec with Matchers {
     }
   }
   it should "work for PG-13" in {
-    val x = Rating("PG-13")
+    val x = Rating.parse("PG-13")
     x should matchPattern {
-      case Rating("PG", Some(13)) =>
+      case Success(Rating("PG", Some(13))) =>
     }
   }
   it should "work for R" in {
-    val x = Rating("R")
+    val x = Rating.parse("R")
     x should matchPattern {
-      case Rating("R", None) =>
+      case Success(Rating("R", None)) =>
     }
   }
   it should "work for PG-0-" in {
-    an [Exception] should be thrownBy(Rating("PG-0-"))
+    val x = Rating.parse("PG-0-")
+    x should matchPattern {
+      case Failure(_) =>
+    }
   }
   it should "work for PG-XX" in {
-    an [Exception] should be thrownBy(Rating("PG-XX"))
+    val x = Rating.parse("PG-XX")
+    x should matchPattern {
+      case Failure(_) =>
+    }
   }
 
   behavior of "Format"
@@ -115,12 +121,6 @@ class MovieSpec extends FlatSpec with Matchers {
 
   behavior of "Reviews"
 
-  it should "work for params" in {
-    val x = Reviews(8.14, 42, Rating("PG-13"), 7, 10, 12, 99)
-    x should matchPattern {
-      case Reviews(8.14, 42, Rating("PG", Some(13)), 7, 10, 12, 99) =>
-    }
-  }
   it should "work for List[String]" in {
     val x = Reviews.parse(List("8.14", "42", "PG-13", "7", "10", "12", "99"))
     x should matchPattern {

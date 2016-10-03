@@ -28,7 +28,7 @@ case class Format(color: Boolean, language: String, aspectRatio: Double, duratio
     val x = color match {
       case true => "Color";
       case _ => "B&W"
-    };
+    }
     s"$x,$language,$aspectRatio,$duration"
   }
 }
@@ -42,7 +42,7 @@ case class Format(color: Boolean, language: String, aspectRatio: Double, duratio
   * @param titleYear the year the title was registered (?)
   */
 case class Production(country: String, budget: Int, gross: Int, titleYear: Int) {
-  def isKiwi() = this match {
+  def isKiwi = this match {
     case Production("New Zealand", _, _, _) => true
     case _ => false
   }
@@ -75,9 +75,9 @@ case class Name(first: String, middle: Option[String], last: String, suffix: Opt
   override def toString = {
     case class Result(r: StringBuffer) { def append(s: String): Unit = r.append(" "+s); override def toString = r.toString}
     val r: Result = Result(new StringBuffer(first))
-    middle foreach {r.append(_)}
+    middle foreach (r.append)
     r.append(last)
-    suffix foreach {r.append(_)}
+    suffix foreach (r.append)
     r.toString
   }
 }
@@ -177,7 +177,7 @@ object Reviews {
     Function.map7(imdbScore, facebookLikes, contentRating, numUsersReview, numUsersVoted, numCriticReviews, totalFacebookLikes)(Reviews.apply)
 
   def parse(params: List[String]): Try[Reviews] = params match {
-    case imdbScore :: facebookLikes :: contentRating :: numUsersReview :: numUsersVoted :: numCriticReviews :: totalFacebookLikes :: Nil => parse(Try(imdbScore.toDouble), Try(facebookLikes.toInt), Try(Rating(contentRating)), Try(numUsersReview.toInt), Try(numUsersVoted.toInt), Try(numCriticReviews.toInt), Try(totalFacebookLikes.toInt))
+    case imdbScore :: facebookLikes :: contentRating :: numUsersReview :: numUsersVoted :: numCriticReviews :: totalFacebookLikes :: Nil => parse(Try(imdbScore.toDouble), Try(facebookLikes.toInt), Rating.parse(contentRating), Try(numUsersReview.toInt), Try(numUsersVoted.toInt), Try(numCriticReviews.toInt), Try(totalFacebookLikes.toInt))
     case _ => Failure(new Exception(s"logic error in Reviews: $params"))
   }
 }
@@ -211,9 +211,9 @@ object Rating {
     * @param s a String made up of a code, optionally followed by a dash and a number, e.g. "R" or "PG-13"
     * @return a Rating
     */
-  def apply(s: String): Rating =
+  def parse(s: String): Try[Rating] =
     s match {
-      case rRating(code, _, age) => apply(code, Try(age.toInt).toOption)
-      case _ => throw new Exception(s"parse error in Rating: $s")
+      case rRating(code, _, age) => Success(apply(code, Try(age.toInt).toOption))
+      case _ => Failure(new Exception(s"parse error in Rating: $s"))
     }
 }
