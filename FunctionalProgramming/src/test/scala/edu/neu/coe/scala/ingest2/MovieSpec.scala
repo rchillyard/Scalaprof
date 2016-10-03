@@ -77,8 +77,8 @@ class MovieSpec extends FlatSpec with Matchers {
       case Rating("R", None) =>
     }
   }
-  it should "work for PG-0" in {
-    an [Exception] should be thrownBy(Rating("PG-XX"))
+  it should "work for PG-0-" in {
+    an [Exception] should be thrownBy(Rating("PG-0-"))
   }
   it should "work for PG-XX" in {
     an [Exception] should be thrownBy(Rating("PG-XX"))
@@ -95,7 +95,7 @@ class MovieSpec extends FlatSpec with Matchers {
   it should "work for List[String]" in {
     val x = Format.parse(List("Color", "Swahili", phi.toString, "129"))
     x should matchPattern {
-      case Format(true, "Swahili", `phi`, 129) =>
+      case Success(Format(true, "Swahili", `phi`, 129)) =>
     }
   }
 
@@ -108,9 +108,9 @@ class MovieSpec extends FlatSpec with Matchers {
     }
   }
   it should "work for List[String]" in {
-    val x = Production(List("Kenya", "1000000", "1000001", "2016"))
+    val x = Production.parse(List("Kenya", "1000000", "1000001", "2016"))
     x should matchPattern {
-      case Production("Kenya", 1000000, 1000001, 2016) =>
+      case Success(Production("Kenya", 1000000, 1000001, 2016)) =>
     }
   }
   it should "define isKiwi properly" in {

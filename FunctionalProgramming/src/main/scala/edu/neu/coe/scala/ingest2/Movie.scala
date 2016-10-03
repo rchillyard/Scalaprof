@@ -3,7 +3,7 @@ package edu.neu.coe.scala.ingest2
 import edu.neu.coe.scala.ingest.{Ingest, Ingestible}
 
 import scala.collection.mutable
-import scala.io.Source
+import scala.io.{BufferedSource, Source}
 import scala.util._
 
 /**
@@ -13,7 +13,7 @@ import scala.util._
   *
   * Created by scalaprof on 9/12/16.
   */
-case class Movie(title: String, format: Format, production: Production, reviews: Try[Reviews], director: Principal, actor1: Principal, actor2: Principal, actor3: Principal, genres: Seq[String], plotKeywords: Seq[String], imdb: String)
+case class Movie(title: String, format: Try[Format], production: Try[Production], reviews: Try[Reviews], director: Principal, actor1: Principal, actor2: Principal, actor3: Principal, genres: Seq[String], plotKeywords: Seq[String], imdb: String)
 
 /**
   * The movie format (including language and duration).
@@ -66,10 +66,10 @@ case class Principal(name: Name, facebookLikes: Int) {
 /**
   * A name of a contributor to the production
   *
-  * @param first         first name
-  * @param middle        middle name or initial
-  * @param last          last name
-  * @param suffix        suffix
+  * @param first  first name
+  * @param middle middle name or initial
+  * @param last   last name
+  * @param suffix suffix
   */
 case class Name(first: String, middle: Option[String], last: String, suffix: Option[String]) {
   override def toString = {
@@ -103,9 +103,15 @@ object Movie extends App {
   val ingester = new Ingest[Movie]()
   if (args.length > 0) {
     val source = Source.fromFile(args.head)
-    val kiwiMovies: Iterator[Try[Movie]] = for (my <- ingester(source)) yield for (m <- my; if m.production.isKiwi) yield m
+    val kiwiMovies = getMoviesFromCountry(source,"New Zealand")
     kiwiMovies foreach { _ foreach { println(_) } }
     source.close()
+  }
+
+  def getMoviesFromCountry(source: BufferedSource, country: String): Iterator[Try[Movie]] = {
+    for (my <- ingester(source)) yield
+      // TODO 12 points -- using a pattern match (NOT a filter) -- and see Assignment4 for important hint
+      ???
   }
 
   /**
@@ -128,10 +134,10 @@ object Movie extends App {
     * @return a Movie
     */
   def apply(ws: Seq[String]): Movie = {
-    // we ignore facenumber_in_poster since I have no idea what that means.
+    // we ignore facenumber_in_poster.
     val title = ws(11)
     val format = Format.parse(elements(ws, 0, 19, 26, 3))
-    val production = Production(elements(ws, 20, 22, 8, 23))
+    val production = Production.parse(elements(ws, 20, 22, 8, 23))
     val reviews = Reviews.parse(elements(ws, 25, 27, 21, 18, 12, 2, 13))
     val director = Principal(elements(ws, 1, 4))
     val actor1 = Principal(elements(ws, 10, 7))
@@ -142,43 +148,40 @@ object Movie extends App {
     val imdb = ws(17)
     Movie(title, format, production, reviews, director, actor1, actor2, actor3, genres, plotKeywords, imdb)
   }
-
-  def map3[T1,T2,T3,R](x1t: Try[T1], x2t: Try[T2], x3t: Try[T3])(f: (T1,T2,T3)=>R): Try[R] = ??? // TODO 3 points
-
-  def map7[T1,T2,T3,T4,T5,T6,T7,R](x1t: Try[T1], x2t: Try[T2], x3t: Try[T3], x4t: Try[T4], x5t: Try[T5], x6t: Try[T6], x7t: Try[T7])(f: (T1,T2,T3,T4,T5,T6,T7)=>R): Try[R] = ??? // TODO 2 points
-
-  def lift[T, U](f: T => U): Try[T]=>Try[U] = ??? // TODO 3 points
-
-  def liftMap[S, T, U](f: S => T => U): S=>Try[T]=>Try[U] = { s => lift(f(s))} // TODO 12 points
-
-  def invert[T,U,V](f: T=>U=>V): U=>T=>V = ??? // TODO 12 points
-
 }
 
 object Format {
-  def parse(params: List[String]): Format = params match {
-    case color :: language :: aspectRatio :: duration :: Nil => apply(color == "Color", language, aspectRatio.toDouble, duration.toInt)
+  def parse(params: List[String]): Try[Format] = params match {
+    case color :: language :: aspectRatio :: duration :: Nil =>
+      for (f <- applyCu2L2(Try(duration.toInt), Try(aspectRatio.toDouble))) yield f(language)(color == "Color")
     case _ => throw new Exception(s"logic error in Format: $params")
   }
-  val applyFormat: (Boolean,String,Double,Int)=>Format = {(x1,x2,x3,x4) => apply(x1,x2,x3,x4)}
-  val applyListString: (List[String])=>Format = parse
-//  val applyC = applyFormat.curried
-//  val applyC2: (Boolean,String)=>(Double,Int)=>Format = { (b,w) => {(x,i) => apply(b,w,x,i)}}
-//  val applyC3: Boolean=>String=>(Double,Int)=>Format = { b => { w => {(x,i) => apply(b,w,x,i)}}
-//  val applyC3L: Boolean=>String=>Try[(Double,Int)]=>Try[Format] = { x => { w => Movie.lift[(Double,Int),Format](applyC3(x)(w))}}
-//  def parse(color: Boolean, language: String, aspectRatio: Try[Double], duration: Try[Int]) =
+
+  // XXX I'm not sure why we can't simply reference apply directly without having to do it this way
+  val applyFormat: (Boolean, String, Double, Int) => Format = { (x1, x2, x3, x4) => apply(x1, x2, x3, x4) }
+  val applyC = Format.applyFormat.curried
+  val applyCi = OurFunction.invert4(applyC)
+  val applyCU2 = OurFunction.uncurried2(applyCi)
+  val applyCu2L2 = OurFunction.lift2(applyCU2)
 }
 
 object Production {
-  def apply(params: List[String]): Production = params match {
-    case country :: budget :: gross :: titleYear :: Nil => apply(country, budget.toInt, gross.toInt, titleYear.toInt)
+  def parse(params: List[String]): Try[Production] = params match {
+    case country :: budget :: gross :: titleYear :: Nil =>
+      for (f <- applyCu3L3(Try(titleYear.toInt), Try(gross.toInt), Try(budget.toInt))) yield f(country)
     case _ => throw new Exception(s"logic error in Production: $params")
   }
+
+  val applyProduction: (String, Int, Int, Int) => Production = { (x1, x2, x3, x4) => apply(x1, x2, x3, x4) }
+  val applyC = Production.applyProduction.curried
+  val applyCi = OurFunction.invert4(applyC)
+  val applyCU3 = OurFunction.uncurried3(applyCi)
+  val applyCu3L3 = OurFunction.lift3(applyCU3)
 }
 
 object Reviews {
   def parse(imdbScore: Try[Double], facebookLikes: Try[Int], contentRating: Try[Rating], numUsersReview: Try[Int], numUsersVoted: Try[Int], numCriticReviews: Try[Int], totalFacebookLikes: Try[Int]): Try[Reviews] =
-    Movie.map7(imdbScore, facebookLikes, contentRating, numUsersReview, numUsersVoted, numCriticReviews, totalFacebookLikes)(Reviews.apply)
+    OurFunction.map7(imdbScore, facebookLikes, contentRating, numUsersReview, numUsersVoted, numCriticReviews, totalFacebookLikes)(Reviews.apply)
 
   def parse(params: List[String]): Try[Reviews] = params match {
     case imdbScore :: facebookLikes :: contentRating :: numUsersReview :: numUsersVoted :: numCriticReviews :: totalFacebookLikes :: Nil => parse(Try(imdbScore.toDouble), Try(facebookLikes.toInt), Try(Rating(contentRating)), Try(numUsersReview.toInt), Try(numUsersVoted.toInt), Try(numCriticReviews.toInt), Try(totalFacebookLikes.toInt))
@@ -205,7 +208,7 @@ object Principal {
     case _ => throw new Exception(s"logic error in Principal: $params")
   }
 
-  def apply(name: String, facebookLikes: Int): Principal = apply(Name(name),facebookLikes)
+  def apply(name: String, facebookLikes: Int): Principal = apply(Name(name), facebookLikes)
 }
 
 object Rating {
@@ -219,7 +222,7 @@ object Rating {
     */
   def apply(s: String): Rating =
     s match {
-    case rRating(code, _, age) => apply(code, Try(age.toInt).toOption)
-    case _ => throw new Exception(s"parse error in Rating: $s")
-  }
+      case rRating(code, _, age) => apply(code, Try(age.toInt).toOption)
+      case _ => throw new Exception(s"parse error in Rating: $s")
+    }
 }
