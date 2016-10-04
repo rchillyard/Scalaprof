@@ -60,4 +60,9 @@ class RandomStateSpec extends FlatSpec with Matchers {
     val r2 = r1.flatMap(RandomState(_))
     r2.get shouldBe 4804307197456638271L
   }
+  "for comprehension" should "work" in {
+    val r1 = RandomState(0)
+    val z: RandomState[Double] = for (x <- r1; y <- RandomState(x)) yield x.toDouble/Long.MaxValue
+    z.get shouldBe -0.5380644352028887 +- 0.0001
+  }
 }

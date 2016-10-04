@@ -1,7 +1,9 @@
 package edu.neu.coe.scala.ingest2
 
+import edu.neu.coe.scala.ingest.Ingest
 import org.scalatest.{FlatSpec, Matchers}
 
+import scala.io.Source
 import scala.util._
 
 /**
@@ -126,5 +128,16 @@ class MovieSpec extends FlatSpec with Matchers {
     x should matchPattern {
       case Success(Reviews(8.14, 42, Rating("PG", Some(13)), 7, 10, 12, 99)) =>
     }
+  }
+
+  behavior of "Movie.getMoviesFromCountry"
+
+  it should "work for the sample file" in {
+    val ingester = new Ingest[Movie]()
+    val source = Source.fromFile("movie_metadata.csv")
+    val mys = Movie.getMoviesFromCountry("New Zealand", ingester(source))
+    val kiwiMovies: Iterator[Movie] = for (my <- mys; if my.isSuccess) yield my.get
+    kiwiMovies.size shouldBe 4
+    source.close()
   }
 }
