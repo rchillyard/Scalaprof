@@ -3,7 +3,7 @@ package edu.neu.coe.scala.ingest2
 import edu.neu.coe.scala.ingest.{Ingest, Ingestible}
 
 import scala.collection.mutable
-import scala.io.{BufferedSource, Source}
+import scala.io.{BufferedSource, Codec, Source}
 import scala.util._
 
 /**
@@ -102,6 +102,7 @@ object Movie extends App {
 
   val ingester = new Ingest[Movie]()
   if (args.length > 0) {
+    implicit val codec = Codec.UTF8
     val source = Source.fromFile(args.head)
     val kiwiMovies = getMoviesFromCountry("New Zealand", ingester(source))
     kiwiMovies foreach { _ foreach (println) }
