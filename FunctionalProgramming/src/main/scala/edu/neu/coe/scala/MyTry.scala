@@ -15,5 +15,5 @@ class MyTry {
 
 object MyTry extends App {
   val ty = new MyTry().getTime
-  ty foreach {System.out.println(_)}
+  ty foreach { System.out.println(_) }
 }
