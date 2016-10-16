@@ -1,5 +1,6 @@
 package edu.neu.coe.scala.ingest2
 
+import edu.neu.coe.scala.MonadOps
 import edu.neu.coe.scala.ingest.{Ingest, Ingestible}
 
 import scala.collection.mutable
@@ -13,7 +14,7 @@ import scala.util._
   *
   * Created by scalaprof on 9/12/16.
   */
-case class Movie(title: String, format: Try[Format], production: Try[Production], reviews: Try[Reviews], director: Try[Principal], actor1: Try[Principal], actor2: Try[Principal], actor3: Try[Principal], genres: Seq[String], plotKeywords: Seq[String], imdb: String)
+case class Movie(format: Format, production: Production, reviews: Reviews, director: Principal, actor1: Principal, actor2: Principal, actor3: Principal, title: String, genres: Seq[String], plotKeywords: Seq[String], imdb: String)
 
 /**
   * The movie format (including language and duration).
@@ -95,7 +96,13 @@ case class Rating(code: String, age: Option[Int]) {
 object Movie extends App {
 
   trait IngestibleMovie extends Ingestible[Movie] {
-    def fromString(w: String): Try[Movie] = Try(Movie(w.split(",").toSeq))
+    def fromString(w: String): Try[Movie] = Movie.parse(w.split(",").toSeq)
+  }
+
+  import spray.json._
+
+  object MoviesProtocol extends DefaultJsonProtocol {
+    ??? // TODO 20 points
   }
 
   implicit object IngestibleMovie extends IngestibleMovie
@@ -104,15 +111,23 @@ object Movie extends App {
   if (args.length > 0) {
     implicit val codec = Codec.UTF8
     val source = Source.fromFile(args.head)
-    val kiwiMovies = getMoviesFromCountry("New Zealand", ingester(source))
-    kiwiMovies foreach { _ foreach (println) }
+    val by = for (ms <- getMoviesFromCountry("New Zealand", ingester(source))) yield testSerializationAndDeserialization(ms)
+    by match {
+      case Success(true) => println ("round trip works OK!")
+      case _ => println("failure")
+    }
     source.close()
   }
 
-  def getMoviesFromCountry(country: String, mys: Iterator[Try[Movie]]): Iterator[Try[Movie]] =
-    for (my <- mys) yield
-      // TODO 12 points -- using for comprehension based on pattern match (NOT a filter) -- and see Assignment4 for important hint
-      ???
+  def testSerializationAndDeserialization(ms: Seq[Movie]): Boolean = {
+    ??? // TODO 18 points
+ }
+
+  def getMoviesFromCountry(country: String, movies: Iterator[Try[Movie]]): Try[Seq[Movie]] = {
+    val mys = for (my <- movies.toSeq) yield
+      for (m <- my; if m.production.country == country) yield m
+    MonadOps.sequence(for (my <- mys; if my.isSuccess) yield my)
+  }
 
   /**
     * Form a list from the elements explicitly specified (by position) from the given list
@@ -133,7 +148,7 @@ object Movie extends App {
     * @param ws a sequence of Strings
     * @return a Movie
     */
-  def apply(ws: Seq[String]): Movie = {
+  def parse(ws: Seq[String]): Try[Movie] = {
     // we ignore facenumber_in_poster.
     val title = ws(11)
     val format = Format.parse(elements(ws, 0, 19, 26, 3))
@@ -146,8 +161,11 @@ object Movie extends App {
     val plotKeywords = ws(16).split("""\|""").toList
     val genres = ws(9).split("""\|""").toList
     val imdb = ws(17)
-    Movie(title, format, production, reviews, director, actor1, actor2, actor3, genres, plotKeywords, imdb)
+    import Function._
+    val fy = lift7(uncurried7((apply _).curried))
+    for (f <- fy(format, production, reviews, director, actor1, actor2, actor3)) yield f(title)(genres)(plotKeywords)(imdb)
   }
+
 }
 
 object Format {

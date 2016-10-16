@@ -136,9 +136,24 @@ class MovieSpec extends FlatSpec with Matchers {
     val ingester = new Ingest[Movie]()
     implicit val codec = Codec.UTF8
     val source = Source.fromFile("movie_metadata.csv")
-    val mys = Movie.getMoviesFromCountry("New Zealand", ingester(source))
-    val kiwiMovies: Iterator[Movie] = for (my <- mys; if my.isSuccess) yield my.get
-    kiwiMovies.size shouldBe 4
+    val msy = Movie.getMoviesFromCountry("New Zealand", ingester(source))
+    msy should matchPattern { case Success(_) => }
+    msy.get.size shouldBe 4
+    source.close()
+  }
+
+  behavior of "Movie.testSerializationAndDeserialization"
+
+  it should "work for the sample file" in {
+    val ingester = new Ingest[Movie]()
+    implicit val codec = Codec.UTF8
+    val source = Source.fromFile("movie_metadata.csv")
+    val msy = Movie.getMoviesFromCountry("New Zealand", ingester(source))
+    val by = for (ms <- msy) yield Movie.testSerializationAndDeserialization(ms)
+    by match {
+      case Success(true) =>
+      case _ => fail("problem")
+    }
     source.close()
   }
 }
