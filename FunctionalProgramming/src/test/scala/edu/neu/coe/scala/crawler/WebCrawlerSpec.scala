@@ -20,6 +20,11 @@ class WebCrawlerSpec extends FlatSpec with Matchers with Futures with ScalaFutur
   val goodURL = "http://www.rubecula.com/RobinHillyard.html"
   val badURL = "http://www.rubecula.com/junk"
 
+  "getURLContent" should s"succeed for $goodURL" in {
+    val wf = WebCrawler.getURLContent(new URL(goodURL))
+    whenReady(wf, timeout(Span(6, Seconds))) { w => w.length shouldBe 2234 }
+  }
+
   "wget(URL)" should s"succeed for $goodURL" in {
     val usfy = for {u <- Try(new URL(goodURL))} yield WebCrawler.wget(u)
     whenReady(MonadOps.flatten(usfy), timeout(Span(6, Seconds))) { us => us.length shouldBe 8 }
@@ -37,7 +42,7 @@ class WebCrawlerSpec extends FlatSpec with Matchers with Futures with ScalaFutur
     usfy.failure.exception should have message "no protocol: x//www.htmldog.com/examples/"
   }
 
-  "wget(Seq[URL])" should "succeed for $goodURL, http://www.dataflowage.com/" in {
+  "wget(Seq[URL])" should s"succeed for $goodURL, http://www.dataflowage.com/" in {
     val ws = List(goodURL, "http://www.dataflowage.com/")
     val uys = for (w <- ws) yield Try(new URL(w))
     val usesfy = for {us <- MonadOps.sequence(uys)} yield WebCrawler.wget(us)
@@ -68,16 +73,24 @@ class WebCrawlerSpec extends FlatSpec with Matchers with Futures with ScalaFutur
   }
 
   "crawler(Seq[URL])" should "succeed for test.html, depth 2" in {
-    val project = "/Users/scalaprof/ScalaClass/FunctionalProgramming"
-    val dir = "src/test/scala"
-    val pkg = "edu/neu/coe/scala/crawler"
-    val file = "test.html"
-    val args = List(s"file://$project/$dir/$pkg/$file")
+    val args = List(s"$goodURL")
     val tries = for (arg <- args) yield Try(new URL(arg))
     //    println(s"tries: $tries")
     val usft = for {us <- MonadOps.sequence(tries)} yield WebCrawler.crawler(2, us)
-    whenReady(MonadOps.flatten(usft), timeout(Span(20, Seconds))) { s => Assertions.assert(s.length == 2) }
+    whenReady(MonadOps.flatten(usft), timeout(Span(60, Seconds))) { s => Assertions.assert(s.length == 9) }
   }
+
+//  "crawler(Seq[URL])" should "succeed for test.html, depth 2" in {
+//    val project = "/Users/scalaprof/ScalaClass/FunctionalProgramming"
+//    val dir = "src/test/scala"
+//    val pkg = "edu/neu/coe/scala/crawler"
+//    val file = "test.html"
+//    val args = List(s"file://$project/$dir/$pkg/$file")
+//    val tries = for (arg <- args) yield Try(new URL(arg))
+//    //    println(s"tries: $tries")
+//    val usft = for {us <- MonadOps.sequence(tries)} yield WebCrawler.crawler(2, us)
+//    whenReady(MonadOps.flatten(usft), timeout(Span(20, Seconds))) { s => Assertions.assert(s.length == 2) }
+//  }
 //  it should "succeed for test.html, depth 3" in {
 //    val project = "/Users/scalaprof/ScalaClass/FunctionalProgramming"
 //    val dir = "src/test/scala"
