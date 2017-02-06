@@ -152,7 +152,8 @@ class MovieSpec extends FlatSpec with Matchers {
     val by = for (ms <- msy) yield Movie.testSerializationAndDeserialization(ms)
     by match {
       case Success(true) =>
-      case _ => fail("problem")
+      case Failure(x) => fail("problem",x)
+      case _ => fail("unknown problem")
     }
     source.close()
   }

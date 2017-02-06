@@ -1,8 +1,9 @@
 package edu.neu.coe.scala.ingest2
 
-import org.scalatest.{FlatSpec, Matchers}
-
+import org.scalatest.{FlatSpec, Matchers, Inside}
+import scala.util.Try
 import scala.util._
+import org.scalatest.matchers.MatchPatternHelper
 
 class FunctionSpec extends FlatSpec with Matchers{
   
@@ -23,20 +24,19 @@ class FunctionSpec extends FlatSpec with Matchers{
   }
   
   it should """fail for "", Int""" in{
-    
+
     val t1 = Try(Name("Robin",Some("C"),"Hillyard",Some("Ph.D")))
     val t2 = Try(24)
-    
+
     val test = Function.map2(t1,t2)(Principal.apply)
 
-    // TODO this was originally a Failure and I have broken that. Chenxi please put it back as it was :)
+    // TODO this was originally a Failure
     test should matchPattern{
       case Success(name) =>
     }
   }
-  
-  
-  
+
+
   behavior of "map7"
   
   it should "success" in
@@ -53,6 +53,19 @@ class FunctionSpec extends FlatSpec with Matchers{
     
     test.get should matchPattern{
       case Reviews(0.02,23,Rating("PG",Some(13)),15,18,20,28) =>
+    }
+  }
+
+  it should """fail with bad input""" in {
+    val p1 = Try(0.02)
+    val p2 = Try(23)
+    val p3 = Rating.parse("PG-XXXX")
+    val p4 = Try(15)
+    val p5 = Try(18)
+    val p6 = Try(20)
+    val p7 = Try(28)
+    Function.map7(p1, p2, p3, p4, p5, p6, p7)(new Reviews(_, _, _, _, _, _, _)) should matchPattern{
+      case Failure(_) =>
     }
   }
 

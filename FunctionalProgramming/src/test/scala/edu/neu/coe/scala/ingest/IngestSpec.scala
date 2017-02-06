@@ -18,7 +18,7 @@ class IngestSpec extends FlatSpec with Matchers {
     }
     implicit object IngestibleInt extends IngestibleInt
     val source = Source.fromChars(Array('x', '\n', '4', '2'))
-    val ingester = new Ingest[Int]()
+    val ingester: Ingest[Int] = new Ingest[Int]()
     val xys: Iterator[Try[Int]] = ingester(source)
     // TODO check that xys has one element, consisting of Success(42) -- 10 points
   }
