@@ -106,10 +106,8 @@ class FunctionSpec extends FlatSpec with Matchers{
     val a:Int => Int=> Int=> Int=>Int = {a => b=> c=> d=> a*b+c*d}
     
     a(2)(3)(4)(5) shouldBe 26
-    
-    val aux = Function.invert3(a)
-    
-    aux(2)(3)(4)(5) shouldBe 22
+
+    Function.invert4(a)(2)(5)(4)(3) shouldBe 22
   }
 
   behavior of "uncurried2"
