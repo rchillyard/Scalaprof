@@ -1,9 +1,8 @@
 package edu.neu.coe.scala.ingest2
 
-import org.scalatest.{FlatSpec, Matchers, Inside}
-import scala.util.Try
-import scala.util._
-import org.scalatest.matchers.MatchPatternHelper
+import org.scalatest.{FlatSpec, Matchers}
+
+import scala.util.{Try, _}
 
 class FunctionSpec extends FlatSpec with Matchers{
   
@@ -35,7 +34,6 @@ class FunctionSpec extends FlatSpec with Matchers{
       case Success(name) =>
     }
   }
-
 
   behavior of "map7"
   
@@ -102,12 +100,12 @@ class FunctionSpec extends FlatSpec with Matchers{
   behavior of "invert4"
 
   it should "work" in {
-    
-    val a:Int => Int=> Int=> Int=>Int = {a => b=> c=> d=> a*b+c*d}
-    
-    a(2)(3)(4)(5) shouldBe 26
 
-    Function.invert4(a)(2)(5)(4)(3) shouldBe 22
+    val a: Int => Int => Int => Int => Int = { a => b => c => d => a * b + c % d }
+
+    a(2)(3)(4)(5) shouldBe 10
+
+    Function.invert4(a)(2)(3)(4)(5) shouldBe 21
   }
 
   behavior of "uncurried2"
