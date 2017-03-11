@@ -4,16 +4,19 @@ package factorial
 import scala.annotation.tailrec
 
 /**
- * @author scalaprof
- */
-class Factorial(val n: Int) extends AnyVal {
-  def getValue: Long = {
-    import scala.annotation.tailrec
-    @tailrec def inner(n: Int, r: Long): Long = if (n<=1) r else inner(n-1,n*r)
-    inner(n,1)
-  }
+  * @author scalaprof
+  */
+class Factorial(val n: Int) extends (()=>Long) {
+  def apply: Long = Factorial.factorial(n)
 }
 
 object Factorial extends App {
-  println(new Factorial(5).getValue)
+  println(new Factorial(5)())
+
+  def factorial(n: Int) = {
+    @tailrec def inner(r: Long, n: Int): Long =
+      if (n <= 1) r
+      else inner(n * r, n - 1)
+    inner(1L, n)
+  }
 }
