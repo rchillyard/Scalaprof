@@ -1,12 +1,9 @@
 package edu.neu.coe.scala.ingest
 
-import edu.neu.coe.scala.{Ingest, Ingestible}
 
 import scala.collection.mutable
 import scala.io.Source
 import scala.util.Try
-import scala.util.matching.Regex
-import edu.neu.coe.scala
 
 /**
   * This class represents a Movie from the IMDB data file on Kaggle.
