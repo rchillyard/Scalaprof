@@ -1,4 +1,4 @@
-package edu.neu.coe.scala
+package edu.neu.coe.csye._7200
 
 /**
   * Created by scalaprof on 9/30/16.

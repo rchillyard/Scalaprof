@@ -1,4 +1,4 @@
-package edu.neu.coe.scala
+package edu.neu.coe.csye._7200
 
 trait Monad[+A] {
   def map[B, C](f: A => B): C

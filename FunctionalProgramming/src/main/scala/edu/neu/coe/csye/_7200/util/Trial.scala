@@ -1,4 +1,4 @@
-package edu.neu.coe.scala.util
+package edu.neu.coe.csye._7200.util
 
 import scala.util.{Try,Failure}
 

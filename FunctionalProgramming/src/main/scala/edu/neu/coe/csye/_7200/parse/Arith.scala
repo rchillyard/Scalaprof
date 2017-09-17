@@ -1,4 +1,4 @@
-package edu.neu.coe.scala.parse
+package edu.neu.coe.csye._7200.parse
 
 import scala.util.parsing.combinator._
 
