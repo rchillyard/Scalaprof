@@ -44,27 +44,17 @@ case object Five extends Rank {val name = "5"; val priority = 3}
 case object Four extends Rank {val name = "4"; val priority = 2}
 case object Trey extends Rank {val name = "3"; val priority = 1}
 case object Deuce extends Rank {val name = "2"; val priority = 0}
-
 case object Spades extends Suit { val name = "Spades"; val priority = 3 }
 case object Hearts extends Suit { val name = "Hearts"; val priority = 2 }
 case object Diamonds extends Suit { val name = "Diamonds"; val priority = 1 }
 case object Clubs extends Suit { val name = "Clubs"; val priority = 0 }
 case object Notrump extends Suit { val name = "Notrump"; val priority = 4; override def initial = "NT"}
-  
-object Rank {
-}
-object Suit {
-}
 case class Card (suit: Suit, rank: Rank) extends Ordered[Card] {
   val bridgeStyle = true // as opposed to poker-style
   private def nameTuple = (suit.initial,rank.initial)
   override def toString = if (bridgeStyle) nameTuple.toString else nameTuple.swap.toString
   def compare(that: Card): Int = implicitly[Ordering[(Suit, Rank)]].compare(Card.unapply(this).get, Card.unapply(that).get)
 }
-
-object Card {
-}
-
 object Cards extends App {
   println(List(Card(Clubs,Deuce),Card(Clubs,King),Card(Clubs,Ten),Card(Spades,Deuce)).sorted)
 }

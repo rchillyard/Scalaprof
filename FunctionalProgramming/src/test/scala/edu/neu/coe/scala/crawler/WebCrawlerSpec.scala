@@ -72,7 +72,7 @@ class WebCrawlerSpec extends FlatSpec with Matchers with Futures with ScalaFutur
     }
   }
 
-  "crawler(Seq[URL])" should "succeed for test.html, depth 2" in {
+  "crawler(Seq[URL])" should s"succeed for $goodURL, depth 2" in {
     val args = List(s"$goodURL")
     val tries = for (arg <- args) yield Try(new URL(arg))
     //    println(s"tries: $tries")
