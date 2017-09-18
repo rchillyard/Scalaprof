@@ -5,7 +5,7 @@ import java.io.File
 
 object ListWorksheet {
   println("Welcome to the MiniDatabase worksheet")
-	val minidatabase = getClass.getResource("/edu/neu/coe/scala/minidatabase.csv")
+	val minidatabase = getClass.getResource("/edu/neu/coe/csye/_7200/minidatabase.csv")
 
     val src = Source.fromURL(minidatabase)
     
