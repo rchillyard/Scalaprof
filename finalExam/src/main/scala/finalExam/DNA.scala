@@ -7,18 +7,24 @@ package finalExam
  * Total marks available for this question: 36
  */
 case class DNA(bs: List[Base]) {
+	  def +(b: Base) = DNA(b::bs) // or DNA(b+:bs)
+			  def ++(d: DNA) = DNA(d.bs:::bs) // or DNA(d.bs++bs)
+			  def zip(d: DNA) = bs zip d.bs
+			  def euclidean(d: DNA) = bs.zip(d.bs).foldLeft(0)((dis, t) => dis + DNA.dist(t._2, t._1))
+			  def bases = bs.length
+			  override def toString = bs.foldLeft("")((str, s) => s.toString + str)//bs.reverse mkString // bs.foldLeft("")((sum,i)=>sum+i.toString())
   // add a base to the beginning of the list bs
-  def +(b: Base): DNA = ??? // 6 marks
+//  def +(b: Base): DNA = ??? // 6 marks
   // concatenate two DNA molecules together
-  def ++(d: DNA): DNA = ??? // 4 marks
+//  def ++(d: DNA): DNA = ??? // 4 marks
   // generate a list of base pairs (order doesn't matter)
-  def zip(d: DNA): List[(Base,Base)] = ??? // 7 marks
+//  def zip(d: DNA): List[(Base,Base)] = ??? // 7 marks
   // get the (total) Euclidean distance between this and "d" by using the DNA.dist method
-  def euclidean(d: DNA): Int = ??? // 8 marks
+//  def euclidean(d: DNA): Int = ??? // 8 marks
   // count the total number of bases 
-  def bases: Int = ??? // 3 marks
+//  def bases: Int = ??? // 3 marks
   // create a string from the toString methods of the various Bases.
-  override def toString: String = ??? // 8 marks
+//  override def toString: String = ??? // 8 marks
 }
 trait Base {
   def pair: Base
