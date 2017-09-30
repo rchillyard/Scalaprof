@@ -33,4 +33,6 @@ object Suit extends Enumeration {
 import edu.neu.coe.csye._7200.enums.enumeration.Rank._
 import edu.neu.coe.csye._7200.enums.enumeration.Suit._
 
+import scala.language.implicitConversions
+
 case class Card (rank: Rank, suit: Suit)

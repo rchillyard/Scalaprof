@@ -28,7 +28,7 @@ public class Tuple {
         Tuple tuple = (Tuple) o;
 
         if (x != tuple.x) return false;
-        return (new Double(y).equals(new Double(tuple.y)));
+        return (new Double(y).equals(tuple.y));
 //     return Double.compare(tuple.y, y) == 0;
     }
 

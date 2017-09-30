@@ -3,7 +3,7 @@ package edu.neu.coe.csye._7200.parse
 import java.io.{File, InputStream}
 import java.net.URI
 
-import edu.neu.coe.scala.trial._
+import edu.neu.coe.csye._7200.trial.CurriedTrial
 
 import scala.collection.GenTraversableOnce
 import scala.io.Source
@@ -24,7 +24,7 @@ import scala.util.parsing.combinator._
  * 
  * @author scalaprof
  *
- * @param <X>
+ * @tparam X a sub-class of Product, ie. a Tuple
  */
 trait ProductStream[X <: Product] {
   /**
@@ -56,7 +56,7 @@ trait ProductStream[X <: Product] {
 	 * @param pk function to yield a primary key value from a tuple
 	 * @return a Map where each element is of form pk->tuple
 	 */
-  def toMap[K](pk: X=>K): Map[K,X] = (for {x <- asList } yield (pk(x)->x)).toMap
+  def toMap[K](pk: X=>K): Map[K,X] = (for {x <- asList } yield pk(x) -> x).toMap
   /**
 	 * @param i get the ith row as a tuple
 	 * @return Some(tuple) if i is valid, else None
@@ -96,13 +96,13 @@ abstract class TupleStreamBase[X <: Product](parser: CsvParser, input: Stream[St
 	 * @return a Tuple
 	 * @throws an exception if any of the underlying code generated a Failure
 	 */
-  def stringToTuple[X <: Product](f: String=>Try[Any])(s: String): X = stringToTryTuple(f)(s).get
+  def stringToTuple(f: String=>Try[Any])(s: String): X = stringToTryTuple(f)(s).get
   protected lazy val wsy: Try[Seq[String]] = parser.parseRow(input.head)
   private def stringToTryTuple[X <: Product](f: String=>Try[Any])(s: String): Try[X] =
     for {
       ws <- parser.parseRow(s)
       // Note that the following will result in a Failure[NoSuchElementException] if the filter results in false
-      if (ws.size==header.size)
+      if ws.size == header.size
       // Note that the specification of [X] in the following is essential
       t <- TupleStream.seqToTuple[X](ws)(f)
     } yield t
@@ -125,7 +125,7 @@ case class CSV[X <: Product](parser: CsvParser, input: Stream[String]) extends T
    * Note that the [X] following stringToTuple looks optional, but it is not!
 	 * @return a Stream of [X] objects
  	*/
-  def tuples = input.tail map stringToTuple[X](parser.elementParser)
+  def tuples = input.tail map stringToTuple(parser.elementParser)
   /**
    * method to project ("slice") a ProductStream into a single column 
 	 * @param key the name of the column
@@ -148,7 +148,7 @@ case class CSV[X <: Product](parser: CsvParser, input: Stream[String]) extends T
  * @param X a Tuple which should correspond with the number of values (all types of the tuple should be String).
  */
 case class TupleStream[X <: Product](parser: CsvParser, input: Stream[String]) extends TupleStreamBase[X](parser,input) {
-  def tuples = input.tail map stringToTuple[X]{x=>Success(x)}
+  def tuples = input.tail map stringToTuple{x=>Success(x)}
   /**
    * method to project ("slice") a ProductStream into a single column 
 	 * @param key the name of the column
@@ -197,9 +197,9 @@ abstract class CsvParserBase(f: String=>Try[Any]) extends JavaTokenParsers {
   def elementParser = f
 }
 case class CsvParser(
-    delimiter: String = ",", // delimiter separating elements within rows
-    quoteChar: String = """"""", // quotation char to all strings to include literal delimiter character
-    elemParser: String=>Try[Any] = CurriedTrial(CsvParser.parseDate _)(CsvParser.dateFormatStrings) :| CsvParser.parseElem _ // element parser (used only by CSV class, not by TupleStream)
+                      delimiter: String = ",", // delimiter separating elements within rows
+                      quoteChar: String = """"""", // quotation char to all strings to include literal delimiter character
+                      elemParser: String=>Try[Any] = CurriedTrial(CsvParser.parseDate)(CsvParser.dateFormatStrings) :| CsvParser.parseElem // element parser (used only by CSV class, not by TupleStream)
   ) extends CsvParserBase(elemParser) {
   def row: Parser[List[String]] = ??? // TODO Assignment6 3: row ::= term { delimiter term }
   def term: Parser[String] = ??? // TODO Assignment6 7: term ::= quoteChar text quoteChar | text
@@ -219,9 +219,9 @@ object CsvParser {
   def parseDate(dfs: Seq[String])(s: String): Try[Any] = {
     @tailrec def loop(formats: Seq[DateTimeFormatter],result: Try[DateTime]): Try[DateTime] = formats match {
       case Nil => result
-      case h :: t => loop(t, result orElse(Try(h.parseDateTime(s))))
+      case h :: t => loop(t, result orElse Try(h.parseDateTime(s)))
     }
-    loop(dfs map {DateTimeFormat.forPattern(_)},Failure(new RuntimeException(s""""$s" cannot be parsed as date""")))
+    loop(dfs map {DateTimeFormat.forPattern},Failure(new RuntimeException(s""""$s" cannot be parsed as date""")))
   }
   def unquote(r: Regex)(s: String): Try[String] = s match {case r(w) => Success(w)}
   def elementParser(x: Nothing)(s: String): Try[Any] = parseElem(x)

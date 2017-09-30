@@ -1,4 +1,4 @@
-package edu.neu.coe.scala
+package edu.neu.coe.csye._7200
 
 //trait Document[K, +V] extends (Seq[K]=>V) {
 //  def get(x: Seq[K]): Option[V]

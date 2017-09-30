@@ -1,14 +1,14 @@
 package edu.neu.coe.csye._7200.ingest2
 
+import edu.neu.coe.csye._7200.MonadOps
 import edu.neu.coe.csye._7200.ingest.{Ingest, Ingestible}
-import edu.neu.coe.scala.MonadOps
 
 import scala.collection.mutable
 import scala.io.{Codec, Source}
 import scala.util._
 
 /**
-  * This is a variation on the previous Movie class (in edu.neu.coe.scala.ingest)
+  * This is a variation on the previous Movie class (in edu.neu.coe.csye._7200.ingest)
   * This class represents a Movie from the IMDB data file on Kaggle.
   * Although the limitation on 22 fields in a case class has partially gone away, it's still convenient to group the different attributes together into logical classes.
   *
@@ -26,10 +26,7 @@ case class Movie(format: Format, production: Production, reviews: Reviews, direc
   */
 case class Format(color: Boolean, language: String, aspectRatio: Double, duration: Int) {
   override def toString = {
-    val x = color match {
-      case true => "Color";
-      case _ => "B&W"
-    }
+    val x = if (color) "Color" else "B&W"
     s"$x,$language,$aspectRatio,$duration"
   }
 }
@@ -76,9 +73,9 @@ case class Name(first: String, middle: Option[String], last: String, suffix: Opt
   override def toString = {
     case class Result(r: StringBuffer) { def append(s: String): Unit = r.append(" "+s); override def toString = r.toString}
     val r: Result = Result(new StringBuffer(first))
-    middle foreach (r.append)
+    middle foreach r.append
     r.append(last)
-    suffix foreach (r.append)
+    suffix foreach r.append
     r.toString
   }
 }
@@ -215,7 +212,7 @@ object Name {
 
 object Principal {
   def parse(params: List[String]): Try[Principal] = params match {
-    case name :: facebookLikes :: Nil => Function.map2(Name.parse(name), Try(facebookLikes.toInt))(apply _)
+    case name :: facebookLikes :: Nil => Function.map2(Name.parse(name), Try(facebookLikes.toInt))(apply)
     case _ => Failure(new Exception(s"logic error in Principal: $params"))
   }
 }

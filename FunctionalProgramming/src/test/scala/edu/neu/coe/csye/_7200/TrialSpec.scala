@@ -1,8 +1,8 @@
-package edu.neu.coe.scala
+package edu.neu.coe.csye._7200
 
 import org.scalatest.{ FlatSpec, Matchers }
 import scala.util._
-import edu.neu.coe.scala.trial._
+import edu.neu.coe.csye._7200.trial._
 
 class TrialSpec extends FlatSpec with Matchers {
   "First" should """transform "2" into 2""" in {
@@ -27,7 +27,7 @@ class TrialSpec extends FlatSpec with Matchers {
     trial("true") should matchPattern { case Success(true) => }
   }
   it should """transform anything into 1""" in {
-    val trial = Identity[String,Any]() :|| Seq({x: String => Try(1)}, {x: String => Try(2)}, {x: String => Try(3)})
+    val trial = Identity[String,Any]() :|| Seq({ _: String => Try(1)}, { _: String => Try(2)}, { _: String => Try(3)})
     trial("") should matchPattern { case Success(1) => }
   }
   "CurriedTrial" should "convert 2 into 5" in {

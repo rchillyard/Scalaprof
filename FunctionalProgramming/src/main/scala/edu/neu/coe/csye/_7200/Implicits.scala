@@ -1,4 +1,7 @@
-package edu.neu.coe.csye._7200;
+package edu.neu.coe.csye._7200
+
+import scala.language.implicitConversions
+;
 
 /**
  * @author scalaprof
@@ -9,7 +12,7 @@ object Implicits extends App {
 
   def myAdd(x: Int, y: Int): Int = x+y
 
-  implicit def stringToInt(x: String) = x.toInt;
+  implicit def stringToInt(x: String) = x.toInt
 
   myAdd("1","2")
 

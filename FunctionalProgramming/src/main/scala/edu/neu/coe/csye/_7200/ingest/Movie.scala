@@ -22,10 +22,7 @@ case class Movie(title: String, format: Format, production: Production, reviews:
   */
 case class Format(color: Boolean, language: String, aspectRatio: Double, duration: Int) {
   override def toString = {
-    val x = color match {
-      case true => "Color";
-      case _ => "B&W"
-    };
+    val x = if (color) "Color" else "B&W"
     s"$x,$language,$aspectRatio,$duration"
   }
 }
@@ -39,7 +36,7 @@ case class Format(color: Boolean, language: String, aspectRatio: Double, duratio
   * @param titleYear the year the title was registered (?)
   */
 case class Production(country: String, budget: Int, gross: Int, titleYear: Int) {
-  def isKiwi() = this match {
+  def isKiwi = this match {
     case Production("New Zealand", _, _, _) => true
     case _ => false
   }
@@ -72,9 +69,9 @@ case class Name(first: String, middle: Option[String], last: String, suffix: Opt
   override def toString = {
     case class Result(r: StringBuffer) { def append(s: String): Unit = r.append(" "+s); override def toString = r.toString}
     val r: Result = Result(new StringBuffer(first))
-    middle foreach {r.append(_)}
+    middle foreach {r.append}
     r.append(last)
-    suffix foreach {r.append(_)}
+    suffix foreach {r.append}
     r.toString
   }
 }

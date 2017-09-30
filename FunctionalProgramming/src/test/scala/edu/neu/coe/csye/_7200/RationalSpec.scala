@@ -1,4 +1,4 @@
-package edu.neu.coe.scala
+package edu.neu.coe.csye._7200
 
 import org.scalatest.{ FlatSpec, Matchers }
 import Rational.RationalHelper
@@ -12,7 +12,7 @@ class RationalSpec extends FlatSpec with Matchers {
 		Rational(0)
 	}
   it should "be ZERO" in {
-    Rational(0) shouldBe (Rational.ZERO)
+    Rational(0) shouldBe Rational.ZERO
   }
 	it should "be whole" in {
 		Rational.ZERO shouldBe 'whole
@@ -21,10 +21,10 @@ class RationalSpec extends FlatSpec with Matchers {
 		Rational.ZERO shouldBe 'zero
 	}
 	it should "equal 0" in {
-		(Rational.ZERO.toInt) should be (0)
+		Rational.ZERO.toInt should be (0)
 	}
 	it should "equal infinity when inverted" in {
-		(Rational.ZERO.invert) shouldBe 'infinity
+		Rational.ZERO.invert shouldBe 'infinity
 	}
   it should "equal BigDecimal.ZERO" in {
     Rational.ZERO.toBigDecimal shouldBe BigDecimal(0)
@@ -35,27 +35,27 @@ class RationalSpec extends FlatSpec with Matchers {
   }
 
   "1/2" should "be OK" in {
-    Rational.HALF * 2 shouldBe (Rational.ONE)
+    Rational.HALF * 2 shouldBe Rational.ONE
   }
   it should "equal HALF" in {
-    Rational("1/2") shouldBe (Rational.HALF)
+    Rational("1/2") shouldBe Rational.HALF
   }
   it should "be half of ONE" in {
-    Rational.HALF * 2 shouldBe (Rational.ONE)
+    Rational.HALF * 2 shouldBe Rational.ONE
   }
   it should "be OK using r-interpolator" in {
-    r"1/2" * 2 shouldBe (Rational.ONE)
+    r"1/2" * 2 shouldBe Rational.ONE
   }
   it should "be OK using r-interpolator with variable" in {
     val denom = 2
-    r"1/$denom" * denom shouldBe (Rational.ONE)
+    r"1/$denom" * denom shouldBe Rational.ONE
   }
   
   "1" should "be OK" in {
     Rational(1)
   }
   it should "be ONE" in {
-    Rational(1) shouldBe (Rational.ONE)
+    Rational(1) shouldBe Rational.ONE
   }
   it should "be whole" in {
     Rational.ONE shouldBe 'whole
@@ -64,13 +64,13 @@ class RationalSpec extends FlatSpec with Matchers {
     Rational.ONE shouldBe 'unity
   }
   it should "equal 1" in {
-    (Rational.ONE.toInt) should be (1)
+    Rational.ONE.toInt should be (1)
   }
   it should "not equal infinity when inverted" in {
-    (Rational.ONE.invert) should not be 'infinity
+    Rational.ONE.invert should not be 'infinity
   }
   it should "equal itself when inverted" in {
-    (Rational.ONE.invert) should be (Rational.ONE)
+    Rational.ONE.invert should be (Rational.ONE)
   }
   it should "equal BigDecimal.ONE" in {
     Rational.ONE.toBigDecimal shouldBe BigDecimal(1)
@@ -84,7 +84,7 @@ class RationalSpec extends FlatSpec with Matchers {
 		Rational(10)
 	}
   it should "be TEN" in {
-    Rational(10) shouldBe (Rational.TEN)
+    Rational(10) shouldBe Rational.TEN
   }
 	it should "be whole" in {
 		Rational.TEN shouldBe 'whole
@@ -93,7 +93,7 @@ class RationalSpec extends FlatSpec with Matchers {
 		Rational.TEN should not be 'zero
 	}
 	it should "equal 10" in {
-		(Rational.TEN.toInt) should  be (10)
+		Rational.TEN.toInt should  be (10)
 	}
   it should "equal 5*2" in {
     (Rational.TEN/2) should  be (Rational(5))
@@ -119,7 +119,7 @@ class RationalSpec extends FlatSpec with Matchers {
 		(Rational(2,3)*3 toInt) should be (2)
 	}
 	it should "equal 3/2 when inverted" in {
-		(Rational(2,3).invert) should be (Rational(3,2))
+		Rational(2, 3).invert should be (Rational(3,2))
 	}
   it should "equal 5/3 when added to 1" in {
     (Rational.ONE+Rational(2,3)) should be (Rational(5,3))

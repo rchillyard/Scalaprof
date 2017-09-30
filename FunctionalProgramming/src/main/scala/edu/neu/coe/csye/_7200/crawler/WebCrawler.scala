@@ -2,7 +2,7 @@ package edu.neu.coe.csye._7200.crawler
 
 import java.net.URL
 
-import edu.neu.coe.scala.MonadOps
+import edu.neu.coe.csye._7200.MonadOps
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent._

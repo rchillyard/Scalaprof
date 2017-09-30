@@ -1,4 +1,4 @@
-package edu.neu.coe.csye._7200;
+package edu.neu.coe.csye._7200
 
 package object trial {
 
@@ -7,7 +7,7 @@ package object trial {
   /**
    * alias for a X=>Try[Y]
  	 */
- 	type Trial[-X,+Y] = Function1[X,Try[Y]]
+ 	type Trial[-X,+Y] = (X) => Try[Y]
 
 	/**
 	 * Trait ComposableTrial which is a function X=>Try[Y] which can be composed with other X=>Try[Y] functions.

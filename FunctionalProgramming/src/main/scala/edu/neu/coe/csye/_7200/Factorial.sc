@@ -1,4 +1,4 @@
-package edu.neu.coe.scala
+package edu.neu.coe.csye._7200
 
 object Factorial {
   println("Welcome to the Factorial worksheet")   //> Welcome to the Factorial worksheet

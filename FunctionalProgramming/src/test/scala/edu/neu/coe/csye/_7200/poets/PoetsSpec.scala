@@ -1,6 +1,6 @@
 package edu.neu.coe.csye._7200.poets
 
-import edu.neu.coe.scala.poets._
+import edu.neu.coe.csye._7200.poets._
 import org.scalatest.{FlatSpec, Matchers}
 
 /**

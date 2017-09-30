@@ -5,7 +5,7 @@ package edu.neu.coe.csye._7200.ga
  */
 trait Gene[+A] extends Seq[Allele[A]] with Identifier
 
-trait Allele[+A] extends Function0[A]
+trait Allele[+A] extends (() => A)
 
 trait Locus[+A] extends Seq[Gene[A]]
 
@@ -16,6 +16,7 @@ trait Chromosome[+A] extends Seq[Locus[A]] {
 
 trait Genotype[+A,-B] extends Seq[Chromosome[A]] {
   def genomic: Genomic[A]
+  // TODO fix this
   def express[A,B](expresser: Expresser[A,B]): Phenotype[B]
 }
 
@@ -36,7 +37,7 @@ trait Trait[+B] extends Identifier {
 
 trait Environment[+C] extends Seq[EcoFactor[C]] with Identifier
 
-trait EcoFactor[+C] extends Function0[C] with Identifier
+trait EcoFactor[+C] extends (() => C) with Identifier
 
 trait Identifier {
   def identify: String

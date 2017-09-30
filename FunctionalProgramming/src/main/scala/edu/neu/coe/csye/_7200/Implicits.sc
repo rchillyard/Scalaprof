@@ -1,5 +1,7 @@
-package edu.neu.coe.scala
+package edu.neu.coe.csye._7200
 package implicits
+
+import scala.language.implicitConversions
 
 object Implicits {
   println("Welcome to the Implicits worksheet")   //> Welcome to the Implicits worksheet

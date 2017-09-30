@@ -1,6 +1,6 @@
 package edu.neu.coe.csye._7200.enums.caseobject
 
-import edu.neu.coe.scala.enums.caseobject._
+import edu.neu.coe.csye._7200.enums.caseobject._
 import org.scalatest._
 
 /**

@@ -1,6 +1,5 @@
 package edu.neu.coe.csye._7200.random
 
-import edu.neu.coe.scala.random.UniformDouble
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.language.postfixOps
@@ -22,18 +21,18 @@ class RandomStateSpec extends FlatSpec with Matchers {
 
   "RandomState(0L)" should "match case RandomState(4804307197456638271)" in {
     val r: RandomState[Long] = RandomState(0L)
-    r.next should matchPattern { case JavaRandomState(4804307197456638271L,identity) => }
+    r.next should matchPattern { case JavaRandomState(4804307197456638271L, _) => }
   }
   it should "match case RandomState(-1034601897293430941) on next" in {
     val r: RandomState[Long] = RandomState(0L)
-    r.next.next should matchPattern { case JavaRandomState(-1034601897293430941L,identity) => }
+    r.next.next should matchPattern { case JavaRandomState(-1034601897293430941L, _) => }
   }
   "7th element of RandomState(0)" should "match case RandomState(5082315122564986995L)" in {
-    val lrs = RandomState(0).toStream.drop(6).take(1)
+    val lrs = RandomState(0).toStream.slice(6, 7)
     (lrs head) should matchPattern { case 5082315122564986995L => }
   }
   "Double stream" should "have zero mean" in {
-    val xs = RandomState(0).map(RandomState.longToDouble).toStream take 10001 toList;
+    val xs = RandomState(0).map(RandomState.longToDouble).toStream take 10001 toList
     val mu = mean(xs) //xs.sum/xs.length
     math.abs(mu) shouldBe <= (2E-2)
   }
@@ -63,6 +62,7 @@ class RandomStateSpec extends FlatSpec with Matchers {
   }
   "for comprehension" should "work" in {
     val r1 = RandomState(0)
+    // TODO this looks wrong: y is never used
     val z: RandomState[Double] = for (x <- r1; y <- RandomState(x)) yield x.toDouble/Long.MaxValue
     z.get shouldBe -0.5380644352028887 +- 0.0001
   }

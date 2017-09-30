@@ -1,4 +1,4 @@
-package edu.neu.coe.scala
+package edu.neu.coe.csye._7200
 
 import scala.math.pow
 import scala.annotation.tailrec

@@ -11,13 +11,13 @@ sealed trait Product0 extends Any with Product {
   def canEqual(that: Any) = false
 }
 object Tuple0 extends Product0 {
-  override def toString() = "()"
+  override def toString = "()"
 }
 
 case class SeqProduct(elems: Any*) extends Product {
   override def productArity: Int = elems.size
   override def productElement(i: Int) = elems(i)
-  override def toString() = elems.addString(new StringBuilder(elems.size * 8 + 10), "(" , ",", ")").toString()
+  override def toString = elems.addString(new StringBuilder(elems.size * 8 + 10), "(" , ",", ")").toString()
 }
 
 object Tuples {
@@ -31,10 +31,9 @@ object Tuples {
   }
   def toTuple(elems: Seq[Any]): Product = elems.length match {
     case 0 => Tuple0
-    case size if size <= 22 => {
+    case size if size <= 22 =>
       val refs = for (e <- elems) yield e.asInstanceOf[AnyRef]
       ctors(size - 1).newInstance(refs: _*).asInstanceOf[Product]
-    }
-    case size if size > 22 => new SeqProduct(elems: _*)
+    case size if size > 22 => SeqProduct(elems: _*)
   }
 }

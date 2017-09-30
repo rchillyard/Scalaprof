@@ -5,7 +5,6 @@ package edu.neu.coe.csye._7200.enums.enumeration
  */
 
 import Rank.{Ace, Deuce, Eight, Five, Four, King, Knave, Nine, Queen, Seven, Six, Ten, Trey}
-import Suit
 import Suit.{Clubs, Diamonds, Hearts, Spades}
 import org.scalatest._
 

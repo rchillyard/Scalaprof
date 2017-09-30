@@ -1,4 +1,6 @@
-package edu.neu.coe.scala
+package edu.neu.coe.csye._7200
+
+import scala.language.higherKinds
 
 trait Monoid[A] {
   def op(a1: A, a2: A): A
@@ -35,6 +37,7 @@ object Monoid {
     val zero = Nil
   }
   def foldableList[A] = new Foldable[List] {
+      // TODO looks like problems with type name shadowing here
       def map[A,B](f: A => B): List[B] = ???
       def foldLeft[A,B](z: B)(f: (B, A) => B): B = ??? // tail recursive
       def foldRight[A,B](z: B)(f: (A, B) => B): B = ??? //  NOT tail recursive

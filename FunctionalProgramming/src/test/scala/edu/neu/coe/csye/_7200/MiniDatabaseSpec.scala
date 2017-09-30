@@ -1,7 +1,7 @@
-package edu.neu.coe.scala.minidatabase
+package edu.neu.coe.csye._7200.minidatabase
 
 import org.scalatest.{ FlatSpec, Matchers }
-import edu.neu.coe.scala.minidatabase._
+import edu.neu.coe.csye._7200.minidatabase._
 
 /**
  * @author scalaprof

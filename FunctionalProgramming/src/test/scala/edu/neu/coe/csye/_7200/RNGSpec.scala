@@ -1,4 +1,4 @@
-package edu.neu.coe.scala
+package edu.neu.coe.csye._7200
 
 import org.scalatest.{ FlatSpec, Matchers }
 import rng._
@@ -7,6 +7,17 @@ import rng._
  * @author scalaprof
  */
 class RNGSpec extends FlatSpec with Matchers {
+
+  behavior of "RNG"
+  it should "allow predictable sequential usage" in {
+    val r0: RNG[Long] = LongRNG(0L)
+    val r1 = r0.next
+    r1.value shouldBe -4962768465676381896L
+    val r2 = r1.next
+    r2.value shouldBe 4804307197456638271L
+    val r3 = r2.next
+    r3.value shouldBe -1034601897293430941L
+  }
   
   def sum(xs: Seq[Double]): Double = xs.reduceLeft(_+_) // you must use reduceLeft here...
   def stdDev(xs: Seq[Double]): Double = {
@@ -35,15 +46,15 @@ class RNGSpec extends FlatSpec with Matchers {
   }
   "Double stream" should "have zero mean" in {
     val xs = RNG.values(DoubleRNG(0)) take 1001 toList;
-    (math.abs(mean(xs))) shouldBe <= (5E-3)
+    math.abs(mean(xs)) shouldBe <= (5E-3)
   }
   "0..1 stream" should "have mean = 0.5" in {
     val xs = RNG.values(UniformDoubleRNG(0)) take 1001 toList;
-    (math.abs(meanU(xs)-0.5)) shouldBe <= (5E-3)
+    math.abs(meanU(xs) - 0.5) shouldBe <= (5E-3)
   }
   "Gaussian stream" should "have zero mean" in {
     val xs = RNG.values2(GaussianRNG(0)) take 11111 toList;
-    (math.abs(mean(xs))) shouldBe <= (5E-3)
+    math.abs(mean(xs)) shouldBe <= (5E-3)
   }
   it should "have unit std. deviation" in {
     val xs = RNG.values2(GaussianRNG(0)) take 11111 toList;

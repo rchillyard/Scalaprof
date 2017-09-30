@@ -21,7 +21,7 @@ object Sorting extends App {
   
 object Rational {
     implicit val ord = new RationalOrdering{
-      def compare(x: Rational, y: Rational) = x.value compare(y.value)
+      def compare(x: Rational, y: Rational) = x.value compare y.value
     }
   }
   

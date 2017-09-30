@@ -1,6 +1,5 @@
 package edu.neu.coe.csye._7200.ingest
 
-import edu.neu.coe.scala.ingest.Movie
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.io.Source

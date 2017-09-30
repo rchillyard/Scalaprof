@@ -55,6 +55,6 @@ class PostCode extends JavaTokenParsers {
 
   def area: Parser[String] = """[A-Z]{1,2}""".r
   def unit: Parser[String] = """[A-Z]{2}""".r
-  def digit[Digit] = """\d""".r ^^ { case x => Digit(x.toInt)}
+  def digit[Digit] = """\d""".r ^^ (x => Digit(x.toInt))
   def letter: Parser[String] = """[A-Z]""".r
 }

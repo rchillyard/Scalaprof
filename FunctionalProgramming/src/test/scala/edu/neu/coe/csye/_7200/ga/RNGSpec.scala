@@ -20,24 +20,24 @@ class RNGSpec extends FlatSpec with Matchers {
     (l1 last) should matchPattern {case LongRNG(488730542833106255L) =>}
   }
   "Double stream" should "have zero mean" in {
-    val l1 = RNG.rngs(DoubleRNG.apply(0)) take 1001 toList;
-    val mean = (l1.foldLeft(0.0)(_ + _.value))/l1.length
-    (math.abs(mean)) shouldBe <= (5E-3)
+    val l1 = RNG.rngs(DoubleRNG.apply(0)) take 1001 toList
+    val mean = l1.foldLeft(0.0)(_ + _.value) /l1.length
+    math.abs(mean) shouldBe <= (5E-3)
   }
   "0..1 stream" should "have mean = 0.5 using rngs" in {
-    val l1 = RNG.rngs(UniformDoubleRNG.apply(0)) take 1001 toList;
-    val mean = (l1.foldLeft(0.0)((r,x) => x.value+r))/l1.length
-    (math.abs(mean-0.5)) shouldBe <= (5E-3)
+    val l1 = RNG.rngs(UniformDoubleRNG.apply(0)) take 1001 toList
+    val mean = l1.foldLeft(0.0)((r, x) => x.value + r) /l1.length
+    math.abs(mean - 0.5) shouldBe <= (5E-3)
   }
   it should "have mean = 0.5 using values(rngs)" in {
-    val l1 = RNG.values(RNG.rngs(UniformDoubleRNG.apply(0))) take 1001 toList;
-    val mean = (l1.foldLeft(0.0)((r,x) => x+r))/l1.length
-    (math.abs(mean-0.5)) shouldBe <= (5E-3)
+    val l1 = RNG.values(RNG.rngs(UniformDoubleRNG.apply(0))) take 1001 toList
+    val mean = l1.foldLeft(0.0)((r, x) => x + r) /l1.length
+    math.abs(mean - 0.5) shouldBe <= (5E-3)
   }
   "Gaussian stream" should "have mean = 0 using values2(rngs)" in {
-    val l1 = RNG.values2(RNG.rngs(GaussianRNG.apply(0))) take 11111 toList;
-    val mean = (l1.foldLeft(0.0)(_ + _))/l1.length
-    (math.abs(mean)) shouldBe <= (5E-3)
+    val l1 = RNG.values2(RNG.rngs(GaussianRNG.apply(0))) take 11111 toList
+    val mean = l1.foldLeft(0.0)(_ + _) /l1.length
+    math.abs(mean) shouldBe <= (5E-3)
   }
   
   "uniformDoubleRNG values" should "be ordered" in {
@@ -45,6 +45,6 @@ class RNGSpec extends FlatSpec with Matchers {
     println(x)
     println(x.next)
     val y = RNG.randoms(new UniformDoubleRNG(0L).next) take 10 toList;
-    y.sorted.head should equal (UniformDouble(0.052988271629967366))
+    y.min should equal (UniformDouble(0.052988271629967366))
   }
 }

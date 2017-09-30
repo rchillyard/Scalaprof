@@ -1,6 +1,5 @@
 package edu.neu.coe.csye._7200.ingest2
 
-import edu.neu.coe.scala.ingest2.Rating
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.util.{Try, _}
@@ -16,7 +15,7 @@ class FunctionSpec extends FlatSpec with Matchers{
     val t1 = Try(a1.toInt)
     val t2 = Try(a2.toInt)
     
-    val test = Function.map2(t1, t2)((a:Int,b:Int) => a.toString()+b.toString())
+    val test = Function.map2(t1, t2)((a:Int,b:Int) => a.toString+b.toString)
     
     test should matchPattern {
       case Success("1234") =>
@@ -32,7 +31,7 @@ class FunctionSpec extends FlatSpec with Matchers{
 
     // TODO this was originally a Failure
     test should matchPattern{
-      case Success(name) =>
+      case Success(_) =>
     }
   }
 
@@ -81,7 +80,7 @@ class FunctionSpec extends FlatSpec with Matchers{
     val aux = Function.invert2(a)
     
     Try(aux(0)(2)) should matchPattern{
-      case Failure(e) =>
+      case Failure(_) =>
     }
   }
 

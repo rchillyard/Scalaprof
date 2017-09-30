@@ -1,4 +1,5 @@
-package edu.neu.coe.scala.list
+package edu.neu.coe.csye._7200
+package list
 
 import scala.annotation.tailrec
 
@@ -24,8 +25,8 @@ trait List[+A] {
 //    }
 //    internal(this,0)
 //  }
-  def x3: List[A] = this match {case Nil => Nil; case Cons(hd,tl) => tl}
-  def x3a: Option[A] = this match {case Nil => None; case Cons(hd,tl) => Some(hd)}
+  def x3: List[A] = this match {case Nil => Nil; case Cons(_,tl) => tl}
+  def x3a: Option[A] = this match {case Nil => None; case Cons(hd, _) => Some(hd)}
   def apply(idx: Int): A = {
     @tailrec def internal(as: List[A], x: Int): A = as match {
       case Nil => throw new IndexOutOfBoundsException(s"index out of bounds: $idx")
@@ -72,7 +73,7 @@ case class Cons[+A] (head: A, tail: List[A]) extends List[A] {
     }
   }
   def length: Int = this match {
-    case Cons(h,t) => 1 + t.length
+    case Cons(_,t) => 1 + t.length
   }
 //  def length: Int = {
 //    @tailrec def len(as: List[A], x: Int): Int = as match {
@@ -83,7 +84,7 @@ case class Cons[+A] (head: A, tail: List[A]) extends List[A] {
 //  }
 }
 
-abstract class Counter[-A] extends Function1[A,Int]
+abstract class Counter[-A] extends ((A) => Int)
 
 object List {
   type IntList = List[Int]

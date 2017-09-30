@@ -2,9 +2,9 @@ name := "functionalProgramming"
 
 version := "1.0.0-SNAPSHOT"
 
-scalaVersion := "2.12.3"
+scalaVersion := "2.11.8"
 
-val scalaTestVersion = "3.0.1"
+val scalaTestVersion = "2.2.4"
 
 resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
 

@@ -8,8 +8,8 @@ import scala.util.parsing.combinator._
  */
 class ConcordanceParser extends RegexParsers {
   val rWord = """[\w’]+[,;\.\-\?\!\—]?""".r
-  def word: Parser[(Int,String)] = new PositionalParser(regex(rWord) ^^ { case w => w })
-  def sentence: Parser[Seq[(Int,String)]] = rep(word) ^^ { case s: Seq[(Int,String)] => s }
+  def word: Parser[(Int,String)] = new PositionalParser(regex(rWord) ^^ (w => w))
+  def sentence: Parser[Seq[(Int,String)]] = rep(word) ^^ { s: Seq[(Int, String)] => s }
     
   class PositionalParser(p: Parser[String]) extends Parser[(Int,String)] {
     def apply(in: Input): ParseResult[(Int,String)] =
@@ -25,7 +25,7 @@ object ConcordanceParser {
  
   def main(args: Array[String]): Unit = {
     val docs = for (f <- args) yield Source.fromFile(f).mkString
-    val concordance = for (i <- 0 to docs.length-1) yield (args(i),parseDoc(docs(i)))
+    val concordance = for (i <- docs.indices) yield (args(i),parseDoc(docs(i)))
     println(concordance)
     // an alternative way of looking at the data (gives doc, page, line and char numbers with each string)
     val q = for {(d,xxxx) <- concordance; (p,xxx) <- xxxx; (l,xx) <- xxx; (c,x) <- xx} yield (d, p,l,c,x)
@@ -37,12 +37,12 @@ object ConcordanceParser {
   
   def parseDoc(content: String) = {
     val pages = for (p <- content.split("/p")) yield p
-    for (i <- 0 to pages.length-1) yield (i+1,parsePage(pages(i)))
+    for (i <- pages.indices) yield (i+1,parsePage(pages(i)))
   }
 
   def parsePage(content: String) = {
     val lines = for (l <- content.split("\n")) yield l
-    for (i <- 0 to lines.length-1) yield (i+1,parseLine(lines(i)))
+    for (i <- lines.indices) yield (i+1,parseLine(lines(i)))
   }
 
   def parseLine(line: String): Seq[(Int,String)] = {

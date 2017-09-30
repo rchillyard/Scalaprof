@@ -2,7 +2,6 @@ package edu.neu.coe.csye._7200.parse
 
 import java.io.{File, FileInputStream}
 
-import edu.neu.coe.scala.parse.CsvParser
 import org.joda.time._
 import org.scalatest.{FlatSpec, Matchers}
 

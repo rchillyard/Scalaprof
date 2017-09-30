@@ -1,4 +1,4 @@
-package edu.neu.coe.scala
+package edu.neu.coe.csye._7200
 
 case class Mailer(server: String) {
   import java.net._
@@ -8,17 +8,17 @@ case class Mailer(server: String) {
     val src = scala.io.Source.fromFile(filename)
     for (entry <- src.getLines.map(_.split(","))) out.println(s"To: ${entry(0)}\nDear ${entry(1)},\n$message")
     src.close
-    out.flush
+    out.flush()
   }  
-  def close = {
-    out.close
-    s.close
+  def close() = {
+    out.close()
+    s.close()
   }
 }
 object EmailApp {
   def main(args: Array[String]): Unit = {
-    val mailer = new Mailer("smtp.google.com")
+    val mailer = Mailer("smtp.google.com")
     mailer.doMail(args(0), "mailinglist.csv")
-    mailer.close
+    mailer.close()
   }
 }

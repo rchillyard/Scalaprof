@@ -1,11 +1,12 @@
 package com.phasmid.bridge.duplicate
 
 
+import edu.neu.coe.csye._7200.MonadOps
+
 import scala.io.Source
 import scala.language.postfixOps
 import scala.util._
 import scala.util.parsing.combinator._
-import edu.neu.coe.scala.MonadOps
 
 /**
   * Created by scalaprof on 4/12/16.
@@ -225,8 +226,8 @@ case class PlayResult(r: Either[String,Int]) {
 object PlayResult {
   def apply(s: String): PlayResult = {
     val z = MonadOps.sequence[Int](Try(s.toInt)) match {
-      case Left(t) => Left(s) // we ignore the exception because x is probably just a non-integer
-      case e@Right(r) => Right(r)
+      case Left(_) => Left(s) // we ignore the exception because it is probably just a non-integer
+      case Right(r) => Right(r)
     }
     PlayResult(z)
   }
@@ -250,7 +251,7 @@ class RecapParser extends JavaTokenParsers {
   // XXX play parser yields a Play object and must be two integer numbers followed by a result
   def play: Parser[Play] = wholeNumber~wholeNumber~result ^^ { case n~e~r => Play(Try(n.toInt),Try(e.toInt),r) }
   // XXX result parser yields a PlayResult object and must be either a number (a bridge score) or a string such as DNP or A[+-]
-  def result: Parser[PlayResult] = (wholeNumber | "DNP" | regex("""A[\-\+]?""".r) ) ^^ { case s => PlayResult(s) }
+  def result: Parser[PlayResult] = (wholeNumber | "DNP" | regex("""A[\-\+]?""".r) ) ^^ (s => PlayResult(s))
   // XXX sentence parser recognized a String terminated by a period and yields that String
-  def sentence: Parser[String] = regex("""[^\.]+""".r)~""".""" ^^ {case s~p => s}
+  def sentence: Parser[String] = regex("""[^\.]+""".r)~""".""" ^^ {case s~ _ => s}
 }

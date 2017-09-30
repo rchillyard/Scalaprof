@@ -1,7 +1,7 @@
 package edu.neu.coe.csye._7200.ingest2
 
 import edu.neu.coe.csye._7200.ingest.Ingest
-import edu.neu.coe.scala.ingest2._
+import edu.neu.coe.csye._7200.ingest2._
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.io.{Codec, Source}

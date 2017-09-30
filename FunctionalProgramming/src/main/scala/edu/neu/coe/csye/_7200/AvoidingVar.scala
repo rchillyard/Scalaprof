@@ -1,4 +1,4 @@
-package edu.neu.coe.csye._7200;
+package edu.neu.coe.csye._7200
 
 /**
  * @author scalaprof

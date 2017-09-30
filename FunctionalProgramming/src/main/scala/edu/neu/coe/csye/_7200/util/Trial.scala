@@ -27,7 +27,7 @@ case class Trial[V, T](f: V=>Try[T]) extends TrialBase[V,T](f)
 object Trial {
   // The following method creates a null trial which can be used at the start or end
   // of a chain of functions
-  def none[V,T]: Trial[V,T] = Trial.apply(v => Failure(new Exception("null trial")))
+  def none[V,T]: Trial[V,T] = Trial.apply(_ => Failure(new Exception("null trial")))
   def lift[V,T](f: V=>T): Trial[V,T] = Trial(Lift(f))
 }
 /**

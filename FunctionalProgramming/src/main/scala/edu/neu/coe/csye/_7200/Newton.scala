@@ -1,4 +1,7 @@
-package edu.neu.coe.csye._7200;
+package edu.neu.coe.csye._7200
+
+import scala.annotation.tailrec
+import scala.util.{Failure, Success, Try}
 
 /**
   * Copyright (c) Robin Hillyard (Scalaprof) on 5/20/15.

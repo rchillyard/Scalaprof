@@ -17,7 +17,7 @@ object MiniDatabase2 extends App {
   def load(filename: String) = {
     val src = Source.fromFile(filename)
     val database = src.getLines.toList.map(e => Entry.parse(e.split(",")))
-    val result = database.toSeq
+    val result = database
     src.close
     result
   }

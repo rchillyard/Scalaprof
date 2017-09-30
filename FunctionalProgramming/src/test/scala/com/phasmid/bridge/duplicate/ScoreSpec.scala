@@ -34,7 +34,7 @@ class ScoreSpec extends FlatSpec with Matchers {
     r should matchPattern { case parser.Success(_, _) => }
     r.get.number shouldBe 1
     r.get.direction shouldBe "N"
-    r.get.names should matchPattern {case (x,y) => }
+    r.get.names should matchPattern {case (_, _) => }
     r.get.names._1 shouldBe "Erithacus Rubecula"
 
   }

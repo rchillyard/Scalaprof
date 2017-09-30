@@ -1,4 +1,4 @@
-package edu.neu.coe.scala
+package edu.neu.coe.csye._7200
 
 import scala.collection.GenTraversableOnce
 
@@ -15,7 +15,7 @@ object FunctionalProgramming extends App {
   
     val x = evaluate_3_tenths
     val y = multiply_by_10_over_3(x)
-    println(y + " != 1");
+    println(y + " != 1")
 }
 
 class MyClass(x: Int) {

@@ -1,4 +1,4 @@
-package edu.neu.coe.scala
+package edu.neu.coe.csye._7200
 
 import org.scalatest.{ FlatSpec, Matchers }
 
@@ -10,7 +10,7 @@ class FunctionalProgrammingSpec extends FlatSpec with Matchers {
     "doublePrecision" should "not work properly" in {
     val x = FunctionalProgramming.evaluate_3_tenths
     val y = FunctionalProgramming.multiply_by_10_over_3(x)
-    y should not be (1)
+    y should not be 1
   }
 
 

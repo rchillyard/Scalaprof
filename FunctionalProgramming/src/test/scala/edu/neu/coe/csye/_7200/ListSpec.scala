@@ -1,7 +1,6 @@
-package edu.neu.coe.scala.list
+package edu.neu.coe.csye._7200.list
 
 import org.scalatest.{ FlatSpec, Matchers }
-import edu.neu.coe.scala.list._
 
 /**
  * @author scalaprof

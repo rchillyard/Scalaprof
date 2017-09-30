@@ -1,6 +1,5 @@
 package edu.neu.coe.csye._7200.minidatabase2
 
-import edu.neu.coe.scala.minidatabase2.Name
 import org.scalatest.{FlatSpec, Inside, Matchers}
 
 import scala.util._

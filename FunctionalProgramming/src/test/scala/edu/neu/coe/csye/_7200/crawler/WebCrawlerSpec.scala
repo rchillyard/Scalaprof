@@ -1,10 +1,9 @@
-package edu.neu.coe.scala.crawler
+package edu.neu.coe.csye._7200.crawler
 
 import java.io.FileNotFoundException
 import java.net.{MalformedURLException, URL}
 
-import edu.neu.coe.csye._7200.crawler.WebCrawler
-import edu.neu.coe.scala.MonadOps
+import edu.neu.coe.csye._7200.MonadOps
 import org.scalatest.concurrent.{Futures, ScalaFutures}
 import org.scalatest.time._
 import org.scalatest.{FlatSpec, Matchers, _}
@@ -69,7 +68,7 @@ class WebCrawlerSpec extends FlatSpec with Matchers with Futures with ScalaFutur
           us2 => us2.distinct.size shouldBe 8
             exceptions.size shouldBe 0
         }
-      case f@_ => fail(f.toString())
+      case f@_ => fail(f.toString)
     }
   }
 

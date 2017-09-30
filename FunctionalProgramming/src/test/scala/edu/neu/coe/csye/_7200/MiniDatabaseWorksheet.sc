@@ -1,4 +1,4 @@
-package edu.neu.coe.scala.minidatabase
+package edu.neu.coe.csye._7200.minidatabase
 
 import scala.io.Source
 import java.io.File
@@ -17,9 +17,9 @@ object ListWorksheet {
 //    words.toList
     
     val lines = src.getLines
-    val words = lines map {e => e.split(",")} toList;
-    val entry = words map {w => Entry(w)}
-    entry toList
+    val words = lines map {e => e.split(",")} toList
+  val entry = words map {w => Entry(w)}
+    entry
     
     
     object Height {

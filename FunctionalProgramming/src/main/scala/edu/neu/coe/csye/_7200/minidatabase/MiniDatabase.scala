@@ -1,4 +1,4 @@
-package edu.neu.coe.scala.minidatabase
+package edu.neu.coe.csye._7200.minidatabase
 
 import scala.io.Source
 import scala.util._
@@ -11,7 +11,7 @@ object MiniDatabase extends App {
   def load(filename: String) = {
     val src = Source.fromFile(filename)
     val database = src.getLines.toList.map(e => Entry(e.split(",")))
-    val result = database.toSeq
+    val result = database
     src.close
     result
   }
@@ -41,7 +41,7 @@ case class Height(feet: Int, in: Int) {
 object Entry {
   def apply(name: String, social: String, dob: String, height: String, weight: String): Entry =
     Entry(Name(name),Social(social),Date(dob),Height(height),weight.toInt)
-  def apply(entry: Seq[String]): Entry = apply(entry(0),entry(1),entry(2),entry(3),entry(4))
+  def apply(entry: Seq[String]): Entry = apply(entry.head,entry(1),entry(2),entry(3),entry(4))
 }
 
 object Height {
