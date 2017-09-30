@@ -1,29 +1,5 @@
 package edu.neu.coe.csye._7200.random
 
-//trait MoreFunctionalRandomState[T] extends (()=>(T,MoreFunctionalRandomState[T])) {
-//  /**
-//    * Method to map this random state into another random state
-//    * @param f the function to map a T value into a U value
-//    * @tparam U the underlying type of the resulting random state
-//    * @return a new random state
-//    */
-//  def map[U](f: (T) => U): RandomState[U] = JavaRandomState[U](n,g.andThen(f)) // TODO 13 points
-//
-//
-//  /**
-//    * Method to flatMap this random state into another random state
-//    * @param f the function to map a T value into a RandomState[U] value
-//    * @tparam U the underlying type of the resulting random state
-//    * @return a new random state
-//    */
-//  def flatMap[U](f: T=>MoreFunctionalRandomState[U]): MoreFunctionalRandomState[U] = f(get)
-//
-//  /**
-//    * @return a stream of T values
-//    */
-//  def toStream: Stream[T] = {val (t,next) = apply(); Stream.cons[T](t,next.toStream)}
-//
-//}
 /**
   * Monadic trait which defines a random-state.
   *
