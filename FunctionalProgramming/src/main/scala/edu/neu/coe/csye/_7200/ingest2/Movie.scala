@@ -116,7 +116,7 @@ object Movie extends App {
   }
 
   def testSerializationAndDeserialization(ms: Seq[Movie]): Boolean = {
-    ??? // TODO 18 points
+    ??? // TODO 5 points
  }
 
   def getMoviesFromCountry(country: String, movies: Iterator[Try[Movie]]): Try[Seq[Movie]] = {
