@@ -1,6 +1,5 @@
 package edu.neu.coe.csye._7200.ingest2
 
-import edu.neu.coe.csye._7200.MonadOps
 import edu.neu.coe.csye._7200.ingest.{Ingest, Ingestible}
 
 import scala.collection.mutable
@@ -123,7 +122,7 @@ object Movie extends App {
   def getMoviesFromCountry(country: String, movies: Iterator[Try[Movie]]): Try[Seq[Movie]] = {
     val mys = for (my <- movies.toSeq) yield
       for (m <- my; if m.production.country == country) yield m
-    MonadOps.sequence(for (my <- mys; if my.isSuccess) yield my)
+    Function.sequence(for (my <- mys; if my.isSuccess) yield my)
   }
 
   /**

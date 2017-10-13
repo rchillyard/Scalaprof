@@ -9,6 +9,10 @@ import scala.util.Try
   */
 object Function {
 
+  def sequence[X](xys: Seq[Try[X]]): Try[Seq[X]] = (Try(Seq[X]()) /: xys) {
+    (xsy, xy) => for (xs <- xsy; x <- xy) yield xs :+ x
+  }
+
   /**
     * The map2 function. You already know this one!
     *
