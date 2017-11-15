@@ -19,10 +19,15 @@ object WordCountAWS {
 
   def main(args: Array[String]): Unit = {
 
+    if (args.length != 2) {
+      println("input arguments: <input> <output>")
+      System.exit(2)
+    }
+
     val in = args.head
     val out = args(1)
 
-    val spark = SparkSession
+    implicit val spark = SparkSession
       .builder()
       .appName("WordCountAWS")
       //.master("local[*]") //Uncomment this line if you want to test in local
@@ -30,6 +35,12 @@ object WordCountAWS {
 
     //repartition(1) will send all data to one node therefore it is not recommended for large dataset, this is only for easy reading.
     WordCount.wordCount(spark.read.textFile(in).rdd," ").repartition(1).saveAsTextFile(out)
+
+    val words = WordCount.createWordDS(spark.read.textFile(in)," ")
+    words.createTempView("words")
+    words.cache()
+    //repartition(1) will send all data to one node therefore it is not recommended for large dataset, this is only for easy reading.
+    spark.sql("select word, count(*) from words group by word").repartition(1).write.mode("append").csv(out+"sql")
 
   }
 
