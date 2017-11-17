@@ -12,7 +12,7 @@ import org.apache.spark.sql.SparkSession
   * 5. Application location: find your jar in your AWS S3
   * 6. Arguments: <input> <output>
   *    This example take 2 arguments, input path and output path
-  *    Example: s3n://yourbucketname/input/WordCount.txt s3n://yourbucketname/outputfolder
+  *    Example: s3://yourbucketname/input/WordCount.txt s3://yourbucketname/outputfolder
   *    You may find test file under input folder in this repo
   */
 object WordCountAWS {
