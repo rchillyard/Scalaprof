@@ -12,6 +12,26 @@ object WordCount extends App {
          .reduceByKey(_ + _)
   }
 
+  def wordCount2(lines: RDD[String], separator: String) = {
+    lines.flatMap(_.split(separator))
+        .filter(!_.contains("He"))
+        .map(_.replace(",", ""))
+        .map((_,1))
+        .reduceByKey(_ + _)
+  }
+
+  def wordCount3(lines: RDD[String], separator: String) = {
+    lines.flatMap(_.split(separator))
+        .filter(myFilter(_, "He"))
+        .map(myReplacer _)
+        .map((_,1))
+        .reduceByKey(_ + _)
+  }
+
+  def myFilter(input: String, keyword: String) = !input.contains(keyword)
+
+  def myReplacer(input: String) = input.replace(",","")
+
   case class Word(word: String, count: Int)
 
   def createWordDS(ds: Dataset[String], separator: String)(implicit spark:SparkSession) = {
