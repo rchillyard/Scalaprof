@@ -1,25 +1,21 @@
 package edu.neu.csye._7200
 
-import org.apache.spark.{SparkConf, SparkContext}
-import org.scalatest.{BeforeAndAfter, FlatSpec, Matchers}
+import org.scalatest.{FlatSpec, Matchers}
 
-class WordCountSpec extends FlatSpec with Matchers with BeforeAndAfter  {
+class WordCountSpec extends FlatSpec with Matchers {
 
-  private var sc: SparkContext = _
+  behavior of "myFilter"
 
-  before {
-    sc = new SparkContext(new SparkConf().setAppName("WordCount").setMaster("local[*]"))
+  it should "work" in {
+    WordCount.myFilter("Hello","He") shouldBe false
+    WordCount.myFilter("Hello","he") shouldBe true
   }
 
-  after {
-    if (sc != null) {
-      sc.stop()
-    }
+  behavior of "myReplace"
+
+  it should "work" in {
+    WordCount.myReplacer("abc,") shouldBe "abc"
+    WordCount.myReplacer("abc") shouldBe "abc"
   }
 
-  "result" should "right for wordCount" in {
-    WordCount.wordCount(sc.textFile("input//WordCount.txt")," ").collect() should matchPattern {
-      case Array(("Hello",3),("World",3),("Hi",1)) =>
-    }
-  }
 }

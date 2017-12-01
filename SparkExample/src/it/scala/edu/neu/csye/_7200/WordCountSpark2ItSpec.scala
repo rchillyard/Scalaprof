@@ -3,7 +3,7 @@ package edu.neu.csye._7200
 import org.apache.spark.sql.SparkSession
 import org.scalatest.{BeforeAndAfter, FlatSpec, Matchers}
 
-class WordCountSpark2Spec extends FlatSpec with Matchers with BeforeAndAfter  {
+class WordCountSpark2ItSpec extends FlatSpec with Matchers with BeforeAndAfter  {
 
   implicit var spark: SparkSession = _
 
@@ -19,20 +19,6 @@ class WordCountSpark2Spec extends FlatSpec with Matchers with BeforeAndAfter  {
     if (spark != null) {
       spark.stop()
     }
-  }
-
-  behavior of "myFilter"
-
-  it should "work" in {
-    WordCount.myFilter("Hello","He") shouldBe false
-    WordCount.myFilter("Hello","he") shouldBe true
-  }
-
-  behavior of "myReplace"
-
-  it should "work" in {
-    WordCount.myReplacer("abc,") shouldBe "abc"
-    WordCount.myReplacer("abc") shouldBe "abc"
   }
 
   behavior of "Spark"
